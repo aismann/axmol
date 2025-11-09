@@ -458,6 +458,13 @@ public:
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
+    void showCircles();
+
+private:
+    bool fast;
+    std::chrono::microseconds duration;
+    ax::Label* autoTestLabel = nullptr;
+    ax::Rect rect;
 };
 
 class DrawNodePolygonTest : public DrawNodeBaseTest

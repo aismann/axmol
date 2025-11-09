@@ -125,8 +125,8 @@ bool DrawNode::init()
     updateShader();
 
     _trianglesDirty = true;
-    _pointsDirty = true;
-    _linesDirty  = true;
+    _pointsDirty    = true;
+    _linesDirty     = true;
 
     return true;
 }
@@ -341,14 +341,14 @@ void DrawNode::drawCircle(const Vec2& center,
                           const Color4F& color,
                           float thickness)
 {
-    if (thickness <= 0.0f)
+    if (thickness == -1)
     {
-        AXLOGW("{}: thickness <= 0", __FUNCTION__);
+        _drawSolidCircle(center, radius, color);
         return;
     }
-    if (radius == 0.0f)
+    if (radius <= 0.0f)
     {
-        AXLOGW("{}: radius == 0", __FUNCTION__);
+        AXLOGW("{}: radius <= 0", __FUNCTION__);
         return;
     }
 
@@ -363,6 +363,10 @@ void DrawNode::drawCircle(const Vec2& center,
                           const Color4F& color,
                           float thickness)
 {
+    if (thickness == -1)
+    {
+        _drawSolidCircle(center, radius, color);
+    }
     if (thickness <= 0.0f)
     {
         AXLOGW("{}: thickness <= 0", __FUNCTION__);
@@ -533,7 +537,11 @@ void DrawNode::drawCardinalSpline(const PointArray* configIn,
     _drawPoly(_vertices.data(), segments, false, color, thickness, true);
 }
 
-void DrawNode::drawCatmullRom(const PointArray* pointsIn, unsigned int segments, const Color4F& color, float thickness, bool closed)
+void DrawNode::drawCatmullRom(const PointArray* pointsIn,
+                              unsigned int segments,
+                              const Color4F& color,
+                              float thickness,
+                              bool closed)
 {
     if (thickness <= 0.0f)
     {
@@ -635,6 +643,14 @@ void DrawNode::drawSolidPolygon(const Vec2* verts,
         thickness = 0.0f;
     }
     _drawPolygon(verts, count, fillColor, borderColor, true, thickness, isconvex);
+}
+
+void DrawNode::drawSolidRect(const ax::Rect& rect,
+    const Color4F& color,
+    float thickness,
+    const Color4F& borderColor)
+{
+    drawSolidRect(rect.origin, rect.origin+rect.size, color, thickness, borderColor);
 }
 
 void DrawNode::drawSolidRect(const Vec2& origin,
@@ -751,6 +767,19 @@ void DrawNode::drawSolidCircle(const Vec2& center,
     _drawCircle(center, radius, angle, segments, false, 1.0f, 1.0f, Color4F(), color, true);
 }
 
+void DrawNode::drawSolidCircle(const Vec2& center,
+                               float radius,
+                               const Color4F& color)
+{
+    if (radius < 0.0f)
+    {
+        AXLOGW("{}: radius < 0, changed to 0", __FUNCTION__);
+        radius = 0.0f;
+    }
+    _drawSolidCircle(center, radius, color);
+}
+
+
 void DrawNode::drawColoredTriangle(const Vec2* vertices3, const Color4F* color3)
 {
     Vec2 vertices[3] = {vertices3[0], vertices3[1], vertices3[2]};
@@ -819,8 +848,6 @@ void DrawNode::setBlendFunc(const BlendFunc& blendFunc)
 {
     _blendFunc = blendFunc;
 }
-
-
 
 void DrawNode::visit(Renderer* renderer, const Mat4& parentTransform, uint32_t parentFlags)
 {
@@ -904,7 +931,7 @@ void DrawNode::_drawPolygon(const Vec2* verts,
 
     vertex_count *= 3;
 
-    auto triangles = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
+    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
     _trianglesDirty = true;
 
     // start drawing...
@@ -1046,7 +1073,7 @@ void DrawNode::_drawPoly(const Vec2* verts,
 
         unsigned int vertex_count = (closedPolygon) ? 2 * count : 2 * (count - 1);
 
-        auto line = expandBufferAndGetPointer(_lines, vertex_count);
+        auto line   = expandBufferAndGetPointer(_lines, vertex_count);
         _linesDirty = true;
 
         int ii = 0;
@@ -1074,15 +1101,14 @@ void DrawNode::_drawSegment(const Vec2& from,
                             DrawNode::EndType etStart,
                             DrawNode::EndType etEnd)
 {
-    if (thickness < 1.0f)
-        thickness = 1.0f;
-
-    if (thickness == 1.0f && !properties.drawOrder)
+    if (thickness <= 1.0f && !properties.drawOrder)
     {
-        _drawLine(from, to, color); // fastest way to draw a line
+        _drawLine(from, to, color);  // fastest way to draw a line
     }
     else
     {
+        if (thickness < 1.0f)
+            thickness = 1.0f;
         Vec2 vertices[2] = {from, to};
         applyTransform(vertices, vertices, 2);
 
@@ -1105,7 +1131,7 @@ void DrawNode::_drawSegment(const Vec2& from,
 
         unsigned int vertex_count = 3 * ((etStart != DrawNode::EndType::Butt) ? 2 : 0) + 3 * 2 +
                                     3 * ((etEnd != DrawNode::EndType::Butt) ? 2 : 0);
-        auto triangles = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
+        auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
         _trianglesDirty = true;
 
         int ii = 0;
@@ -1203,8 +1229,7 @@ void DrawNode::_drawLine(const Vec2& from, const Vec2& to, const Color4F& color)
     Vec2 vertices[2] = {from, to};
     applyTransform(vertices, vertices, 2);
 
-
-    auto line = expandBufferAndGetPointer(_lines, 2);
+    auto line   = expandBufferAndGetPointer(_lines, 2);
     _linesDirty = true;
 
     line[0] = {vertices[0], color, Vec2::ZERO};
@@ -1214,7 +1239,7 @@ void DrawNode::_drawLine(const Vec2& from, const Vec2& to, const Color4F& color)
 void DrawNode::_drawDot(const Vec2& pos, float radius, const Color4F& color)
 {
     unsigned int vertex_count = 2 * 3;
-    auto triangles = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
+    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
     _trianglesDirty = true;
 
     V2F_C4B_T2F a = {Vec2(pos.x - radius, pos.y - radius), color, Vec2(-1.0f, -1.0f)};
@@ -1224,6 +1249,55 @@ void DrawNode::_drawDot(const Vec2& pos, float radius, const Color4F& color)
 
     triangles[0] = {a, b, c};
     triangles[1] = {a, c, d};
+}
+
+void DrawNode::_drawSolidCircle(const Vec2& center,
+                               float radius,
+                               const Color4F& fillColor)
+{
+    float width = radius * 4 / (2 * properties.factor);
+
+    Vec2 a  = center;
+    Vec2 b = a;
+    Vec2 n  = {-1, 0};
+    Vec2 t  = {0, -1};
+    Vec2 nw = n * width;
+    Vec2 tw = t * width;
+    Vec2 v0 = b - (nw + tw);
+    Vec2 v1 = b + (nw - tw);
+    Vec2 v2 = b - nw;
+    Vec2 v3 = b + nw;
+    Vec2 v4 = a - nw;
+    Vec2 v5 = a + nw;
+    Vec2 v6 = a - (nw - tw);
+    Vec2 v7 = a + (nw + tw);
+
+    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 12));
+    _trianglesDirty = true;
+
+    int ii          = 0;
+    triangles[ii++] = {
+        {v0, fillColor, -(n + t)},
+        {v1, fillColor, n - t},
+        {v2, fillColor, -n},
+    };
+    triangles[ii++] = {
+        {v3, fillColor, n},
+        {v1, fillColor, n - t},
+        {v2, fillColor, -n},
+    };
+
+    triangles[ii++] = {
+        {v6, fillColor, t - n},
+        {v4, fillColor, -n},
+        {v5, fillColor, n},
+    };
+
+    triangles[ii++] = {
+        {v6, fillColor, t - n},
+        {v7, fillColor, t + n},
+        {v5, fillColor, n},
+    };
 }
 
 void DrawNode::_drawCircle(const Vec2& center,
@@ -1264,8 +1338,7 @@ void DrawNode::_drawCircle(const Vec2& center,
     AX_SAFE_DELETE_ARRAY(_vertices);
 }
 
-void DrawNode::_drawColoredTriangle(Vec2* vertices3,
-                             const Color4F* color3)
+void DrawNode::_drawColoredTriangle(Vec2* vertices3, const Color4F* color3)
 {
     unsigned int vertex_count = 3;
 
@@ -1278,7 +1351,6 @@ void DrawNode::_drawColoredTriangle(Vec2* vertices3,
                     {vertices3[1], color3[1], Vec2::ZERO},
                     {vertices3[2], color3[2], Vec2::ZERO}};
 }
-
 
 void DrawNode::_drawTriangle(Vec2* vertices3,
                              const Color4F& borderColor,
@@ -1296,7 +1368,7 @@ void DrawNode::_drawTriangle(Vec2* vertices3,
     {
         applyTransform(vertices3, vertices3, vertex_count);
 
-        auto triangles = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
+        auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
         _trianglesDirty = true;
 
         triangles[0] = {{vertices3[0], fillColor, Vec2::ZERO},
@@ -1373,7 +1445,7 @@ void DrawNode::_drawPoints(const Vec2* position,
         return;
     }
 
-    auto point = expandBufferAndGetPointer(_points, numberOfPoints);
+    auto point   = expandBufferAndGetPointer(_points, numberOfPoints);
     _pointsDirty = true;
 
     for (unsigned int i = 0; i < numberOfPoints; i++)
@@ -1425,10 +1497,10 @@ void DrawNode::_drawPoint(const Vec2& position,
     }
     else
     {
-        auto point = expandBufferAndGetPointer(_points, 1);
+        auto point   = expandBufferAndGetPointer(_points, 1);
         _pointsDirty = true;
 
-        *point             = {position, color, Vec2(pointSize, 0.0f)};
+        *point = {position, color, Vec2(pointSize, 0.0f)};
     }
 }
 
@@ -1517,7 +1589,7 @@ void DrawNode::_drawPie(const Vec2& center,
             _drawPoly(_vertices.data(), n, false, borderColor, thickness, true);
             break;
         case DrawMode::Line:
-            _drawPoly(_vertices.data(), n,  false, borderColor, thickness, true);
+            _drawPoly(_vertices.data(), n, false, borderColor, thickness, true);
             break;
         case DrawMode::Semi:
             if (fillColor != Color4F::TRANSPARENT)
@@ -1566,7 +1638,7 @@ void DrawNode::applyTransform(const Vec2* from, Vec2* to, unsigned int count)
     if (properties.transform == false)
         return;
 
-    auto scale = properties.scale;
+    auto scale    = properties.scale;
     auto position = properties.position;
 
     if (properties.rotation == 0.0f)
@@ -1581,7 +1653,7 @@ void DrawNode::applyTransform(const Vec2* from, Vec2* to, unsigned int count)
     {
         const float sinRot = sin(properties.rotation);
         const float cosRot = cos(properties.rotation);
-        auto center = properties.center;
+        auto center        = properties.center;
 
         // https://stackoverflow.com/questions/2259476/rotating-a-point-about-another-point-2d
         for (unsigned int i = 0; i < count; i++)
@@ -1609,7 +1681,7 @@ void DrawNode::Properties::setDefaultValues()
 {
     auto fac = Director::getInstance()->getContentScaleFactor();
     factor   = fac;
-    
+
     scale     = Vec2(1.0f, 1.0f);
     center    = Vec2(0.0f, 0.0f);
     rotation  = 0.0f;

@@ -279,7 +279,7 @@ public:
                             unsigned int segments,
                             const Color4F& color,
                             float thickness = 1.0f,
-                            bool closed = false);
+                            bool closed     = false);
 
     /** Draws a Catmull Rom path.
      *
@@ -291,7 +291,7 @@ public:
                         unsigned int segments,
                         const Color4F& color,
                         float thickness = 1.0f,
-                        bool closed = false);
+                        bool closed     = false);
 
     /** draw a dot at a position, with a given radius and color.
      *
@@ -325,6 +325,11 @@ public:
      */
     void drawSolidRect(const Vec2& origin,
                        const Vec2& destination,
+                       const Color4F& color,
+                       float thickness            = 0,
+                       const Color4F& borderColor = Color4F(0, 0, 0, 0));
+
+    void drawSolidRect(const ax::Rect& origin,
                        const Color4F& color,
                        float thickness            = 0,
                        const Color4F& borderColor = Color4F(0, 0, 0, 0));
@@ -391,6 +396,7 @@ public:
      * @param color The solid circle color.
      */
     void drawSolidCircle(const Vec2& center, float radius, float angle, unsigned int segments, const Color4F& color);
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color);
 
     /** Draws a pie given the center, radius, angle, start angle, end angle  and number of segments.
      * @param center The circle center point.
@@ -414,7 +420,7 @@ public:
                  const Color4F& fillColor,
                  const Color4F& borderColor,
                  DrawMode drawMode = DrawMode::Outline,
-                 float thickness = 1.0f);
+                 float thickness   = 1.0f);
 
     // Cocos2dx/Axmol 1.0 API backwards compatibhility
     /** Draws a pie given the center, radius, angle, start angle, end angle  and number of segments.
@@ -438,13 +444,9 @@ public:
                  const Color4F& color,
                  DrawMode drawMode = DrawMode::Outline);
 
-    void setIsConvex(bool isConvex)
-    {
-        AXLOGW("'setIsConvex()' No longer supported. Use the new drawPolygon API.");
-    };
+    void setIsConvex(bool isConvex) { AXLOGW("'setIsConvex()' No longer supported. Use the new drawPolygon API."); };
 
-
-     /** draw a segment with a radius and color.
+    /** draw a segment with a radius and color.
      *
      * @param from The segment origin.
      * @param to The segment destination.
@@ -557,11 +559,11 @@ protected:
     void updateBlendState(CustomCommand& cmd);
     void updateUniforms(const Mat4& transform, CustomCommand& cmd);
 
-    bool _trianglesDirty: 1 = false;
-    bool _pointsDirty: 1 = false;
-    bool _linesDirty: 1 = false;
+    bool _trianglesDirty : 1 = false;
+    bool _pointsDirty : 1    = false;
+    bool _linesDirty : 1     = false;
 
-    bool _isolated: 1 = false;
+    bool _isolated : 1 = false;
 
     BlendFunc _blendFunc;
 
@@ -572,7 +574,6 @@ protected:
     axstd::pod_vector<V2F_C4B_T2F> _triangles;
     axstd::pod_vector<V2F_C4B_T2F> _points;
     axstd::pod_vector<V2F_C4B_T2F> _lines;
-
 
 private:
     // Internal function _drawPoint
@@ -599,8 +600,7 @@ private:
                        bool solid      = true,
                        float thickness = 0.0f);
 
-    void _drawColoredTriangle(Vec2* vertices3,
-                       const Color4F* color3);
+    void _drawColoredTriangle(Vec2* vertices3, const Color4F* color3);
 
     // Internal function _drawAStar
     void _drawAStar(const Vec2& center,
@@ -653,6 +653,9 @@ private:
                      bool solid,
                      float thickness = 1.0f);
 
+    //  since DrawNode 3.0
+    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor);
+
     // Internal function _drawPie
     void _drawPie(const Vec2& center,
                   float radius,
@@ -682,14 +685,13 @@ public:
     class AX_DLL Properties
     {
     public:
-        float factor;  /// thickness scale factor 
+        float factor;  /// thickness scale factor
 
         // transforming stuff
         Vec2 scale;
         Vec2 center;
         float rotation;
         Vec2 position;
-
 
         // Drawing flags
         bool transform = false;
@@ -768,4 +770,3 @@ public:
 
 /** @} */
 }  // namespace ax
-
