@@ -1424,7 +1424,6 @@ DrawNodeTests::DrawNodeTests()
     ADD_TEST_CASE(DrawNodeLineDrawTest);
     ADD_TEST_CASE(DrawNodeMethodsTest);
     ADD_TEST_CASE(DrawNodePlayground);
-
 }
 
 DrawNodeBaseTest::DrawNodeBaseTest()
@@ -3573,6 +3572,18 @@ DrawNodeCircleTest::DrawNodeCircleTest()
         drawNode->drawSolidCircle(Vec2(120, 215), 12, 0, 36, 1.0f, 1.0f, Color4F::BLUE);
         drawNode->drawSolidCircle(Vec2(120, 235), 16, 0, 36, 1.0f, 1.0f, Color4F::BLUE);
     }
+
+    drawNode = DrawNode::create();
+    addChild(drawNode);
+    drawNode->setAnchorPoint(Vec2(0.5f, 0.5f));
+    // drawNode->drawRect(Vec2(123, 123), Vec2(227, 227), Color(1, 1, 0, 1), 2);
+    // drawNode->drawRect(Vec2(115, 130), Vec2(130, 115), Vec2(115, 100), Vec2(100, 115), Color::MAGENTA, 2);
+    for (int i = 0; i < 10; i++)
+    {
+        drawNode->drawRoundedRect(Vec2(115, 130), Vec2(130, 115), 40, Color4F::GREEN, Color4F::GREEN, 2);
+        drawNode->drawRoundedRect(Vec2(10, 50), Vec2(227, 70), 20, Color4F::YELLOW, Color4F::GREEN, 2);
+        drawNode->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY, Color4F::GREEN, 2);
+    }
 }
 
 std::string DrawNodeCircleTest::title() const
@@ -3590,8 +3601,8 @@ DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
     float radius = 40;
     for (int i = 0; i < 10000; i++)
     {
-        Vec2 pos = VisibleRect::center() +
-                   Vec2((VisibleRect::center().x-50) * AXRANDOM_MINUS1_1(), (VisibleRect::center().y -50) * AXRANDOM_MINUS1_1());
+        Vec2 pos = VisibleRect::center() + Vec2((VisibleRect::center().x - 50) * AXRANDOM_MINUS1_1(),
+                                                (VisibleRect::center().y - 50) * AXRANDOM_MINUS1_1());
         drawNode->drawSolidCircle(pos, radius, 0, 36,
                                   Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f));
     }

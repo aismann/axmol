@@ -39,6 +39,21 @@ bool Bug350Layer::init()
         auto background = Sprite::create("Hello.png");
         background->setPosition(size.width / 2, size.height / 2);
         addChild(background);
+
+        auto drawNode = DrawNode::create();
+        addChild(drawNode);
+        drawNode->setAnchorPoint(Vec2(0.5f, 0.5f));
+        // drawNode->drawRect(Vec2(123, 123), Vec2(227, 227), Color(1, 1, 0, 1), 2);
+        // drawNode->drawRect(Vec2(115, 130), Vec2(130, 115), Vec2(115, 100), Vec2(100, 115), Color::MAGENTA, 2);
+        for (int i = 0; i < 10; i++)
+        {
+            drawNode->drawRoundedRect(Vec2(115, 130), Vec2(130, 115), 40, Color4F::GREEN, Color4F::GREEN, 2);
+            drawNode->drawRoundedRect(Vec2(10, 50), Vec2(227, 70), 20, Color4F::YELLOW, Color4F::GREEN, 2);
+            drawNode->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY, Color4F::GREEN, 2);
+        }
+
+
+
         return true;
     }
 
