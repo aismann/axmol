@@ -779,7 +779,6 @@ void DrawNode::drawSolidCircle(const Vec2& center,
     _drawSolidCircle(center, radius, color);
 }
 
-
 void DrawNode::drawColoredTriangle(const Vec2* vertices3, const Color4F* color3)
 {
     Vec2 vertices[3] = {vertices3[0], vertices3[1], vertices3[2]};
@@ -1251,6 +1250,8 @@ void DrawNode::_drawDot(const Vec2& pos, float radius, const Color4F& color)
     triangles[1] = {a, c, d};
 }
 
+
+// transform is not supported (for speed)
 void DrawNode::_drawSolidCircle(const Vec2& center,
                                float radius,
                                const Color4F& fillColor)
@@ -1298,6 +1299,8 @@ void DrawNode::_drawSolidCircle(const Vec2& center,
         {v7, fillColor, t + n},
         {v5, fillColor, n},
     };
+
+  //  _drawLine(from, to, color);  // fastest way to draw a line
 }
 
 void DrawNode::_drawCircle(const Vec2& center,
