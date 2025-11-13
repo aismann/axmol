@@ -1245,7 +1245,11 @@ void DrawNode::_drawDot(const Vec2& pos, float radius, const Color4F& color)
     triangles[1] = {a, c, d};
 }
 
-void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor)
+// transform is not supported (for speed)
+void DrawNode::_drawSolidCircle(const Vec2& center,
+                               float radius,
+                               const Color4F& fillColor)
+
 {
     float width = radius * 4 / (2 * properties.factor);
 
@@ -1322,6 +1326,7 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
         {v5, fillColor, n},
     };
 
+
     width = (radius - 5) * 4 / (2 * properties.factor);
     // _blendFunc = BlendFunc::DISABLE;
 
@@ -1367,6 +1372,7 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
         {v5, fillColor1, n},
     };
     _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
+  //  _drawLine(from, to, color);  // fastest way to draw a line
 }
 
 void DrawNode::_drawCircle(const Vec2& center,
