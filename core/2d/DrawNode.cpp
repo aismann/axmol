@@ -645,12 +645,9 @@ void DrawNode::drawSolidPolygon(const Vec2* verts,
     _drawPolygon(verts, count, fillColor, borderColor, true, thickness, isconvex);
 }
 
-void DrawNode::drawSolidRect(const ax::Rect& rect,
-    const Color4F& color,
-    float thickness,
-    const Color4F& borderColor)
+void DrawNode::drawSolidRect(const ax::Rect& rect, const Color4F& color, float thickness, const Color4F& borderColor)
 {
-    drawSolidRect(rect.origin, rect.origin+rect.size, color, thickness, borderColor);
+    drawSolidRect(rect.origin, rect.origin + rect.size, color, thickness, borderColor);
 }
 
 void DrawNode::drawSolidRect(const Vec2& origin,
@@ -767,9 +764,7 @@ void DrawNode::drawSolidCircle(const Vec2& center,
     _drawCircle(center, radius, angle, segments, false, 1.0f, 1.0f, Color4F(), color, true);
 }
 
-void DrawNode::drawSolidCircle(const Vec2& center,
-                               float radius,
-                               const Color4F& color)
+void DrawNode::drawSolidCircle(const Vec2& center, float radius, const Color4F& color)
 {
     if (radius < 0.0f)
     {
@@ -778,7 +773,6 @@ void DrawNode::drawSolidCircle(const Vec2& center,
     }
     _drawSolidCircle(center, radius, color);
 }
-
 
 void DrawNode::drawColoredTriangle(const Vec2* vertices3, const Color4F* color3)
 {
@@ -1251,14 +1245,41 @@ void DrawNode::_drawDot(const Vec2& pos, float radius, const Color4F& color)
     triangles[1] = {a, c, d};
 }
 
-void DrawNode::_drawSolidCircle(const Vec2& center,
-                               float radius,
-                               const Color4F& fillColor)
+void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor)
 {
     float width = radius * 4 / (2 * properties.factor);
 
+    //    /** Blending disabled. Uses {BlendFactor::ONE, BlendFactor::ZERO} */
+    // static const BlendFunc DISABLE;
+    ///** Blending enabled for textures with Alpha premultiplied. Uses {BlendFactor::ONE,
+    // * BlendFactor::ONE_MINUS_SRC_ALPHA} */
+    // static const BlendFunc ALPHA_PREMULTIPLIED;
+    ///** Blending enabled for textures with Alpha NON premultiplied. Uses {BlendFactor::SRC_ALPHA,
+    // * BlendFactor::ONE_MINUS_SRC_ALPHA} */
+    // static const BlendFunc ALPHA_NON_PREMULTIPLIED;
+    ///** Enables Additive blending. Uses {BlendFactor::SRC_ALPHA, BlendFactor::ONE} */
+    // static const BlendFunc ADDITIVE;
+
+    // enum class BlendFactor : uint32_t
+    //{
+    //     ZERO,
+    //     ONE,
+    //     SRC_COLOR,
+    //     ONE_MINUS_SRC_COLOR,
+    //     SRC_ALPHA,
+    //     ONE_MINUS_SRC_ALPHA,
+    //     DST_COLOR,
+    //     ONE_MINUS_DST_COLOR,
+    //     DST_ALPHA,
+    //     ONE_MINUS_DST_ALPHA,
+    //     CONSTANT_ALPHA,
+    //     SRC_ALPHA_SATURATE,
+    //     ONE_MINUS_CONSTANT_ALPHA,
+    //     BLEND_COLOR
+    // };
+
     Vec2 a  = center;
-    Vec2 b = a;
+    Vec2 b  = a;
     Vec2 n  = {-1, 0};
     Vec2 t  = {0, -1};
     Vec2 nw = n * width;
@@ -1272,8 +1293,10 @@ void DrawNode::_drawSolidCircle(const Vec2& center,
     Vec2 v6 = a - (nw - tw);
     Vec2 v7 = a + (nw + tw);
 
-    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 12));
+    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 24));
     _trianglesDirty = true;
+
+    _blendFunc      = {ax::backend::BlendFactor::ONE, ax::backend::BlendFactor::ZERO};
 
     int ii          = 0;
     triangles[ii++] = {
@@ -1298,6 +1321,52 @@ void DrawNode::_drawSolidCircle(const Vec2& center,
         {v7, fillColor, t + n},
         {v5, fillColor, n},
     };
+
+    width = (radius - 5) * 4 / (2 * properties.factor);
+    // _blendFunc = BlendFunc::DISABLE;
+
+
+    a          = center;
+    b          = a;
+    n          = {-1, 0};
+    t          = {0, -1};
+    nw         = n * width;
+    tw         = t * width;
+    v0         = b - (nw + tw);
+    v1         = b + (nw - tw);
+    v2         = b - nw;
+    v3         = b + nw;
+    v4         = a - nw;
+    v5         = a + nw;
+    v6         = a - (nw - tw);
+    v7         = a + (nw + tw);
+
+    Color4F fillColor1 = Color4F::BLACK;
+    fillColor1.a       = 0.0f;
+
+    triangles[ii++] = {
+        {v0, fillColor1, -(n + t)},
+        {v1, fillColor1, n - t},
+        {v2, fillColor1, -n},
+    };
+    triangles[ii++] = {
+        {v3, fillColor1, n},
+        {v1, fillColor1, n - t},
+        {v2, fillColor1, -n},
+    };
+
+    triangles[ii++] = {
+        {v6, fillColor1, t - n},
+        {v4, fillColor1, -n},
+        {v5, fillColor1, n},
+    };
+
+    triangles[ii++] = {
+        {v6, fillColor1, t - n},
+        {v7, fillColor1, t + n},
+        {v5, fillColor1, n},
+    };
+    _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 }
 
 void DrawNode::_drawCircle(const Vec2& center,
