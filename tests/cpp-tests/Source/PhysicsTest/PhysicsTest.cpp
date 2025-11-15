@@ -117,6 +117,7 @@ Sprite* PhysicsDemo::addGrossiniAtPosition(Vec2 p, float scale /* = 1.0*/)
 
     sp->setScale(scale);
     sp->setPosition(p);
+    sp->setColor(Color3B::ORANGE);
     sp->addComponent(PhysicsBody::createBox(Size(48.0f, 108.0f)));
     this->addChild(sp);
 
@@ -177,7 +178,9 @@ const int LOGO_IMAGE[]    = {
 
 int getPixel(int x, int y)
 {
-    return (LOGO_IMAGE[(x >> 3) + y * LOGO_RAW_LENGTH] >> (~x & 0x7)) & 1;
+    int ret =  (LOGO_IMAGE[(x >> 3) + y * LOGO_RAW_LENGTH] >> (~x & 0x7)) & 1;
+    AXLOGD("x: {} y: {} v {}", x,y,ret);
+    return ret;
 }
 
 float frand()
@@ -325,8 +328,12 @@ void PhysicsDemoLogoSmash::onEnter()
 
     _ball = SpriteBatchNode::create("Images/ball.png", sizeof(LOGO_IMAGE) / sizeof(LOGO_IMAGE[0]));
     addChild(_ball);
+
+
+    AXLOGD("----vvv-----------------------");
     for (int y = 0; y < LOGO_HEIGHT; ++y)
     {
+        AXLOGD("->---");
         for (int x = 0; x < LOGO_WIDTH; ++x)
         {
             if (getPixel(x, y))
@@ -348,7 +355,7 @@ void PhysicsDemoLogoSmash::onEnter()
             }
         }
     }
-
+    AXLOGD("----^^^-----------------------");
     auto bullet = makeBall(Vec2(400.0f, 0.0f), 10, PhysicsMaterial(PHYSICS_INFINITY, 0, 0));
     bullet->getPhysicsBody()->setVelocity(Vec2(200.0f, 0.0f));
 

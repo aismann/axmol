@@ -590,6 +590,44 @@ void DrawNode::drawRect(const Vec2& origin, const Vec2& destination, const Color
     _drawPoly(line, 5, false, color, thickness, true);
 }
 
+void DrawNode::drawRoundedRect(const Vec2& origin,
+                               const Vec2& destination,
+                               float radius,
+                               const Color4F& fillColor,
+                               const Color4F& borderColor,
+                               float thickness)
+{
+    const int segments = 16;  // smoothness of corners
+    Vec2 rect[4]       = {origin + Vec2(radius, radius), origin + Vec2(destination.width - radius, radius),
+                          origin + Vec2(destination.width - radius, destination.height - radius),
+                          origin + Vec2(radius, destination.height - radius)};
+
+    // Center points of the 4 arcs
+    Vec2 centers[4] = {rect[0], rect[1], rect[2], rect[3]};
+
+    float angles[4][2] = {
+        {(float)M_PI, 1.5f * (float)M_PI},      // bottom-left
+        {1.5f * (float)M_PI, 2 * (float)M_PI},  // bottom-right
+        {0, 0.5f * (float)M_PI},                // top-right
+        {0.5f * (float)M_PI, (float)M_PI}       // top-left
+    };
+
+    // Draw filled rounded rect
+    drawSolidRect(origin + Vec2(radius, 0), origin + Vec2(destination.width - radius, destination.height), fillColor);
+    drawSolidRect(origin + Vec2(0, radius), origin + Vec2(destination.width, destination.height - radius), fillColor);
+
+    for (int i = 0; i < 4; i++)
+    {
+        drawSolidCircle(centers[i], radius - .5f, 0, segments + radius, fillColor);
+    }
+
+    // Optional: outline
+    for (int i = 0; i < 4; i++)
+    {
+        //    drawPie(centers[i], radius, angles[i][0], angles[i][1] - angles[i][0], segments, borderColor);
+    }
+}
+
 void DrawNode::drawSegment(const Vec2& from,
                            const Vec2& to,
                            float thickness,
@@ -764,14 +802,14 @@ void DrawNode::drawSolidCircle(const Vec2& center,
     _drawCircle(center, radius, angle, segments, false, 1.0f, 1.0f, Color4F(), color, true);
 }
 
-void DrawNode::drawSolidCircle(const Vec2& center, float radius, const Color4F& color)
+void DrawNode::drawSolidCircle(const Vec2& center, float radius, const Color4F& color, float angle)
 {
     if (radius < 0.0f)
     {
         AXLOGW("{}: radius < 0, changed to 0", __FUNCTION__);
         radius = 0.0f;
     }
-    _drawSolidCircle(center, radius, color);
+    _drawSolidCircle(center, radius, color, angle);
 }
 
 void DrawNode::drawColoredTriangle(const Vec2* vertices3, const Color4F* color3)
@@ -1246,10 +1284,7 @@ void DrawNode::_drawDot(const Vec2& pos, float radius, const Color4F& color)
 }
 
 // transform is not supported (for speed)
-void DrawNode::_drawSolidCircle(const Vec2& center,
-                               float radius,
-                               const Color4F& fillColor)
-
+void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, float angle)
 {
     float width = radius * 4 / (2 * properties.factor);
 
@@ -1297,10 +1332,10 @@ void DrawNode::_drawSolidCircle(const Vec2& center,
     Vec2 v6 = a - (nw - tw);
     Vec2 v7 = a + (nw + tw);
 
-    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 24));
+    auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 12));
     _trianglesDirty = true;
 
-    _blendFunc      = {ax::backend::BlendFactor::ONE, ax::backend::BlendFactor::ZERO};
+    //    _blendFunc = {ax::backend::BlendFactor::ONE, ax::backend::BlendFactor::ZERO};
 
     int ii          = 0;
     triangles[ii++] = {
@@ -1326,54 +1361,56 @@ void DrawNode::_drawSolidCircle(const Vec2& center,
         {v5, fillColor, n},
     };
 
+    // width = (radius - 5) * 4 / (2 * properties.factor);
+    ////// _blendFunc = BlendFunc::DISABLE;
 
-    width = (radius - 5) * 4 / (2 * properties.factor);
-    // _blendFunc = BlendFunc::DISABLE;
+    // a  = center;
+    // b  = a;
+    // n  = {-1, 0};
+    // t  = {0, -1};
+    // nw = n * width;
+    // tw = t * width;
+    // v0 = b - (nw + tw);
+    // v1 = b + (nw - tw);
+    // v2 = b - nw;
+    // v3 = b + nw;
+    // v4 = a - nw;
+    // v5 = a + nw;
+    // v6 = a - (nw - tw);
+    // v7 = a + (nw + tw);
 
+    //    Color4F fillColor1 = Color4F::BLACK;
+    // fillColor1.a       = 0.0f;
 
-    a          = center;
-    b          = a;
-    n          = {-1, 0};
-    t          = {0, -1};
-    nw         = n * width;
-    tw         = t * width;
-    v0         = b - (nw + tw);
-    v1         = b + (nw - tw);
-    v2         = b - nw;
-    v3         = b + nw;
-    v4         = a - nw;
-    v5         = a + nw;
-    v6         = a - (nw - tw);
-    v7         = a + (nw + tw);
+    // triangles[ii++] = {
+    //     {v0, fillColor1, -(n + t)},
+    //     {v1, fillColor1, n - t},
+    //     {v2, fillColor1, -n},
+    // };
+    // triangles[ii++] = {
+    //     {v3, fillColor1, n},
+    //     {v1, fillColor1, n - t},
+    //     {v2, fillColor1, -n},
+    // };
 
-    Color4F fillColor1 = Color4F::BLACK;
-    fillColor1.a       = 0.0f;
+    // triangles[ii++] = {
+    //     {v6, fillColor1, t - n},
+    //     {v4, fillColor1, -n},
+    //     {v5, fillColor1, n},
+    // };
 
-    triangles[ii++] = {
-        {v0, fillColor1, -(n + t)},
-        {v1, fillColor1, n - t},
-        {v2, fillColor1, -n},
-    };
-    triangles[ii++] = {
-        {v3, fillColor1, n},
-        {v1, fillColor1, n - t},
-        {v2, fillColor1, -n},
-    };
+    // triangles[ii++] = {
+    //     {v6, fillColor1, t - n},
+    //     {v7, fillColor1, t + n},
+    //     {v5, fillColor1, n},
+    // };
+    //_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 
-    triangles[ii++] = {
-        {v6, fillColor1, t - n},
-        {v4, fillColor1, -n},
-        {v5, fillColor1, n},
-    };
-
-    triangles[ii++] = {
-        {v6, fillColor1, t - n},
-        {v7, fillColor1, t + n},
-        {v5, fillColor1, n},
-    };
-    _blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
-  //  _drawLine(from, to, color);  // fastest way to draw a line
+    auto fillColor1 = fillColor;
+    float aa        = AX_DEGREES_TO_RADIANS(angle);
+    _drawLine(center, center + Vec2(radius * cosf(aa), radius * sinf(aa)), fillColor1.negate());
 }
+
 
 void DrawNode::_drawCircle(const Vec2& center,
                            float radius,

@@ -3613,22 +3613,22 @@ DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
 }
 void DrawNodeSolidCircleTest::showCircles()
 {
-    static float radius = 80;
+    static float radius = 300;
     drawNode->clear();
 
-    //Vec2 pos = VisibleRect::center()+ Vec2(200,0);;
-    //Color4F color = Color4F::GRAY;
+    Vec2 pos = VisibleRect::center()+ Vec2(200,0);;
+    Color4F color = Color4F::GRAY;
 
     auto start = std::chrono::high_resolution_clock::now();
    // drawNode->setBlendFunc(BlendFunc::DISABLE);
-    for (int i = 0; i < 20; i++)
+  //  for (int i = 0; i < 20; i++)
     {
-        Vec2 pos = VisibleRect::center() + Vec2((VisibleRect::center().x - 50) * AXRANDOM_MINUS1_1(),
-            (VisibleRect::center().y - 50) * AXRANDOM_MINUS1_1());
-        Color4F color = Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f);
+        //Vec2 pos = VisibleRect::center() + Vec2((VisibleRect::center().x - 50) * AXRANDOM_MINUS1_1(),
+        //    (VisibleRect::center().y - 50) * AXRANDOM_MINUS1_1());
+        //Color4F color = Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f);
         if (fast)
         {
-            drawNode->drawSolidCircle(pos, radius, color);
+            drawNode->drawSolidCircle(pos, radius, color,-270);
         }
         else
         {

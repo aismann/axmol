@@ -396,7 +396,7 @@ public:
      * @param color The solid circle color.
      */
     void drawSolidCircle(const Vec2& center, float radius, float angle, unsigned int segments, const Color4F& color);
-    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color);
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, float angle = 0);
 
     /** Draws a pie given the center, radius, angle, start angle, end angle  and number of segments.
      * @param center The circle center point.
@@ -512,6 +512,13 @@ public:
                            const Color4F& fillColor,
                            const Color4F& borderColor,
                            float thickness = 1.0f);
+
+    void drawRoundedRect(const Vec2& origin,
+                         const Vec2& size,
+                         float radius,
+                         const Color4F& fillColor,
+                         const Color4F& borderColor,
+                         float thickness = 1.0f);
 
     /** Clear the geometry in the node's buffer. */
     void clear();
@@ -654,7 +661,7 @@ private:
                      float thickness = 1.0f);
 
     //  since DrawNode 3.0
-    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor);
+    void _drawSolidCircle(const Vec2& center, float angle, const Color4F& fillColor, float radius = 0);
 
     // Internal function _drawPie
     void _drawPie(const Vec2& center,
