@@ -76,15 +76,19 @@ void PhysicsDebugNodeBox2D::DrawSolidCircle(const b2Vec2& center,
                                             const b2Vec2& axis,
                                             const b2Color& color)
 {
-    Vec2 c = {Vec2(center.x * mRatio, center.y * mRatio) + debugNodeOffset};
-    drawBP->drawSolidCircle(c, radius * mRatio, AX_DEGREES_TO_RADIANS(0), 20, 1.0f, 1.0f,
-                            Color4F(color.r / 2, color.g / 2, color.b / 2, color.a), 0.4f,
-                            Color4F(color.r, color.g, color.b, color.a));
+    
 
-    // Draw a line fixed in the circle to animate rotation.
-    b2Vec2 pp = {(center + radius * axis)};
-    Vec2 cp   = {Vec2(pp.x * mRatio, pp.y * mRatio) + debugNodeOffset};
-    drawBP->drawLine(c, cp, Color4F(color.r, color.g, color.b, color.a));
+    Vec2 c = {Vec2(center.x * mRatio, center.y * mRatio) + debugNodeOffset};
+    drawBP->drawSolidCircle(c, radius * mRatio, Color4F(color.r / 2, color.g / 2, color.b / 2, color.a), Vec2(axis.x, axis.y));
+
+/*    drawBP->drawSolidCircle(c, radius * mRatio, AX_DEGREES_TO_RADIANS(0), 20, 1.0f, 1.0f,
+                            Color4F(color.r / 2, color.g / 2, color.b / 2, color.a), 0.4f,
+                            Color4F(color.r, color.g, color.b, color.a))*/;
+
+    //// Draw a line fixed in the circle to animate rotation.
+    //b2Vec2 pp = {(center + radius * axis)};
+    //Vec2 cp   = {Vec2(pp.x * mRatio, pp.y * mRatio) + debugNodeOffset};
+    //drawBP->drawLine(c, cp, Color4F(color.r, color.g, color.b, color.a));
 }
 
 void PhysicsDebugNodeBox2D::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
