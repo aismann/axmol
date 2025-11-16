@@ -3633,7 +3633,9 @@ void DrawNodeSolidCircleTest::showCircles()
         }
         else
         {
-            drawNode->drawSolidCircle(pos, radius, 0, 36, color);
+            drawNode->drawDot(pos, radius, color);
+         //   drawNode->drawSegment(center),cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body), radius))), 1.0, color);
+          //  drawNode->drawSolidCircle(pos, radius, 0, 36, color);
         }
     }
     auto end = std::chrono::high_resolution_clock::now();

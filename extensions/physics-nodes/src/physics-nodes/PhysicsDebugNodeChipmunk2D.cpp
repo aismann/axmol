@@ -87,9 +87,11 @@ static void DrawShape(cpShape* shape, DrawNode* renderer)
         cpCircleShape* circle = (cpCircleShape*)shape;
         cpVect center         = circle->tc;
         cpFloat radius        = circle->r;
-        renderer->drawDot(cpVert2Point(center), cpfmax(radius, 1.0), color);
-        renderer->drawSegment(cpVert2Point(center),
-                              cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body), radius))), 1.0, color);
+        //renderer->drawDot(cpVert2Point(center), cpfmax(radius, 1.0), color);
+        //renderer->drawSegment(cpVert2Point(center),
+        //                      cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body), radius))), 1.0, color);
+
+        renderer->drawSolidCircle(cpVert2Point(center), radius, color, cpVert2Point(cpBodyGetRotation(body)));
     }
     break;
     case CP_SEGMENT_SHAPE:
