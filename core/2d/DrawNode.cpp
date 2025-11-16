@@ -1347,7 +1347,7 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
     // };
 
 
-    Color4F fillColor1 = fillColor + Color4F(0.5f, 0.5f, 0.5f, 0.0f);
+    Color4F fillColor1 = fillColor + Color4F(0.2f, 0.2f, 0.2f, 0.0f);
     Vec2 a  = center;
     Vec2 b  = a;
     Vec2 n  = {angle.x, angle.y};
@@ -1380,14 +1380,14 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
 
     triangles[ii++] = {
         {v6, fillColor1, t - n},
-        {v4, fillColor, -n},
-        {v5, fillColor, n},
+        {v4, fillColor1, -n},
+        {v5, fillColor1, n},
     };
 
     triangles[ii++] = {
-        {v6, fillColor, t - n},
-        {v7, fillColor, t + n},
-        {v5, fillColor, n},
+        {v6, fillColor, t - n}, //-
+        {v7, fillColor, t + n},  //-
+        {v5, fillColor, n},  // -
     };
 }
 
