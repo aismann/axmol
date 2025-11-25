@@ -3527,16 +3527,16 @@ DrawNodePolygonTest::DrawNodePolygonTest()
     drawNode->drawPoly(horse, sizeof(horse) / sizeof(horse[0]), true, Color4F::GREEN);
     drawNode->properties.setPosition(Vec2(700, 220));
     drawNode->properties.setScale({0.1f, 0.1f});
-    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
+    drawNode->drawSolidPolygon(spider, sizeof(spider) / sizeof(spider[0]), Color4F::YELLOW, 2.0f, Color4F::RED);
     drawNode->properties.setScale({0.2f, 0.2f});
     drawNode->properties.setPosition(Vec2(880, 200));
     drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
     drawNode->properties.setScale({0.4f, 0.4f});
     drawNode->properties.setPosition(Vec2(1100, 160));
-    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
+    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED, true);
     drawNode->properties.setScale({0.7f, 0.7f});
     drawNode->properties.setPosition(Vec2(950, 400));
-    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
+    drawNode->drawSolidPolygon(spider, sizeof(spider) / sizeof(spider[0]),Color4F::YELLOW, 5.0f, Color4F::RED);
 }
 
 std::string DrawNodePolygonTest::title() const
@@ -3741,7 +3741,9 @@ std::string DrawNodeSpLinesTest::subtitle() const
 
 void DrawNodeSpLinesTest::update(float dt)
 {
+    static int xlabel = 10;
     drawNode->clear();
+
 
     // Issue #2302
     auto array = PointArray::create(20);
@@ -3755,11 +3757,26 @@ void DrawNodeSpLinesTest::update(float dt)
     drawNode->drawCardinalSpline(pts, 0.5f, 360, Color4F::RED, 5.0f);
     drawNode->drawCardinalSpline(pts2, 0.5f, 360, Color4F::GREEN, 2.0f);
 
-    int i1 = RandomHelper::random_int(0, n - 1);
-    int i2 = RandomHelper::random_int(0, n - 1);
+    //int i1 = RandomHelper::random_int(0, n - 1);
+    //int i2 = RandomHelper::random_int(0, n - 1);
+    int step = (float) dt;
+    if ((step % 99999) == 0)
+    {
+        xlabel++;
+    }
+
+    if (xlabel > n-1)
+    {
+        xlabel = 0;
+    }
+    int i1 = xlabel;
+    int i2 = xlabel;
+    drawNode->drawLine(pts->getControlPointAtIndex(i1) - Vec2(0,30), pts->getControlPointAtIndex(i1) + Vec2(0,30), Color4F::YELLOW, 2.0f);
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 7, Color4F(0, 1, 0, 0.3));
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 4, Color4F::GREEN);
 
+    drawNode->drawLine(pts2->getControlPointAtIndex(i2) - Vec2(0, 30), pts->getControlPointAtIndex(i2) + Vec2(0, 30),
+                       Color4F::YELLOW, 2.0f);
     drawNode->drawDot(pts2->getControlPointAtIndex(i2), 7, Color4F(0, 1, 0, 0.3));
     drawNode->drawDot(pts2->getControlPointAtIndex(i2), 4, Color4F::GREEN);
 }
