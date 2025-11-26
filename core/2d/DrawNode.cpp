@@ -1387,9 +1387,9 @@ void DrawNode::_drawPoint(const Vec2& position,
                           const Color4F& color,
                           const DrawNode::PointType pointType)
 {
-    if (properties.drawOrder == true)
+    if (pointSize > 1.0f)
     {
-        AXLOGD("properties.drawOrder == true1 {}", pointSize);
+   //     AXLOGD("properties.drawOrder == true1 {}", pointSize);
         float pointSize4 = pointSize * 0.25f;
         Vec2 vec2Size4   = Vec2(pointSize4, pointSize4);
 
@@ -1416,15 +1416,15 @@ void DrawNode::_drawPoint(const Vec2& position,
         return;
     }
 
-    if (pointSize > 1.0f)
-    {
-        AXLOGD("pointSize > 1 {}", pointSize);
-        float pointSize4 = pointSize * 0.25f;
-        Vec2 origin      = position - Vec2(pointSize4, pointSize4);
-        Vec2 destination = position + Vec2(pointSize4, pointSize4);
-        Vec2 _vertices[] = {origin, Vec2(destination.x, origin.y), destination, Vec2(origin.x, destination.y)};
-        _drawPolygon(_vertices, 4, color, color, false, 0.0f, true);
-    }
+    //if (pointSize > 1.0f)
+    //{
+    //    AXLOGD("pointSize > 1 {}", pointSize);
+    //    float pointSize4 = pointSize * 0.25f;
+    //    Vec2 origin      = position - Vec2(pointSize4, pointSize4);
+    //    Vec2 destination = position + Vec2(pointSize4, pointSize4);
+    //    Vec2 _vertices[] = {origin, Vec2(destination.x, origin.y), destination, Vec2(origin.x, destination.y)};
+    //    _drawPolygon(_vertices, 4, color, color, false, 0.0f, true);
+    //}
     else
     {
         AXLOGD("PETER2 {}", pointSize);
