@@ -3523,7 +3523,11 @@ DrawNodePolygonTest::DrawNodePolygonTest()
     addChild(drawNode);
     drawNode->properties.setTransform(true);
     drawNode->setScale(0.3f);
-    drawNode->properties.setPosition(Vec2(50, 220));
+    drawNode->properties.setPosition(Vec2(150, 590));
+    drawNode->properties.setScale({0.4f, 0.4f});
+    drawNode->drawSolidPolygon(horse, sizeof(horse) / sizeof(horse[0]), Color4F::WHITE, 0.0f, Color4F::RED);
+    drawNode->properties.setPosition(Vec2(30, 200));
+    drawNode->properties.setScale({1.0f, 1.0f});
     drawNode->drawPoly(horse, sizeof(horse) / sizeof(horse[0]), true, Color4F::GREEN);
     drawNode->properties.setPosition(Vec2(700, 220));
     drawNode->properties.setScale({0.1f, 0.1f});
@@ -3746,9 +3750,6 @@ void DrawNodeSpLinesTest::update(float dt)
 
     drawNode->clear();
 
-    AXLOGD("dt: {}", dt);
-
-
     // Issue #2302
     auto array = PointArray::create(20);
     for (int i = 0; i < 10; i++)
@@ -3779,9 +3780,9 @@ void DrawNodeSpLinesTest::update(float dt)
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 7, Color4F(0, 1, 0, 0.3));
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 4, Color4F::GREEN);
 
-    drawNode->drawLine(pts2->getControlPointAtIndex(i2) - Vec2(0, 30), pts->getControlPointAtIndex(i2) + Vec2(0, 30),
+    drawNode->drawLine(pts2->getControlPointAtIndex(i2) - Vec2(0, 30), pts2->getControlPointAtIndex(i2) + Vec2(0, 30),
                        Color4F::YELLOW, 2.0f);
-    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 7, Color4F(0, 1, 0, 0.3));
+    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 7, Color4F(1, 0, 0, 0.3));
     drawNode->drawDot(pts2->getControlPointAtIndex(i2), 4, Color4F::RED);
 }
 
