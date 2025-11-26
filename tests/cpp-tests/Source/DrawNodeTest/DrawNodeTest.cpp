@@ -3741,8 +3741,12 @@ std::string DrawNodeSpLinesTest::subtitle() const
 
 void DrawNodeSpLinesTest::update(float dt)
 {
-    static int xlabel = 10;
+    static int xlabel = 0;
+    static float step = 0;
+
     drawNode->clear();
+
+    AXLOGD("dt: {}", dt);
 
 
     // Issue #2302
@@ -3757,20 +3761,20 @@ void DrawNodeSpLinesTest::update(float dt)
     drawNode->drawCardinalSpline(pts, 0.5f, 360, Color4F::RED, 5.0f);
     drawNode->drawCardinalSpline(pts2, 0.5f, 360, Color4F::GREEN, 2.0f);
 
-    //int i1 = RandomHelper::random_int(0, n - 1);
-    //int i2 = RandomHelper::random_int(0, n - 1);
-    int step = (float) dt;
-    if ((step % 99999) == 0)
+
+    step +=  dt;
+    if (step > 0.2)
     {
+        step = 0;
         xlabel++;
+        if (xlabel > n - 1)
+        {
+            xlabel = 0;
+        }
     }
 
-    if (xlabel > n-1)
-    {
-        xlabel = 0;
-    }
     int i1 = xlabel;
-    int i2 = xlabel;
+    int i2 = n-1 - xlabel;
     drawNode->drawLine(pts->getControlPointAtIndex(i1) - Vec2(0,30), pts->getControlPointAtIndex(i1) + Vec2(0,30), Color4F::YELLOW, 2.0f);
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 7, Color4F(0, 1, 0, 0.3));
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 4, Color4F::GREEN);
@@ -3778,7 +3782,7 @@ void DrawNodeSpLinesTest::update(float dt)
     drawNode->drawLine(pts2->getControlPointAtIndex(i2) - Vec2(0, 30), pts->getControlPointAtIndex(i2) + Vec2(0, 30),
                        Color4F::YELLOW, 2.0f);
     drawNode->drawDot(pts2->getControlPointAtIndex(i2), 7, Color4F(0, 1, 0, 0.3));
-    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 4, Color4F::GREEN);
+    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 4, Color4F::RED);
 }
 
 DrawNodeSpLinesOpenClosedTest::DrawNodeSpLinesOpenClosedTest()
