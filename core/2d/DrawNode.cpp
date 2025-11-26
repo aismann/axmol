@@ -1389,6 +1389,7 @@ void DrawNode::_drawPoint(const Vec2& position,
 {
     if (properties.drawOrder == true)
     {
+        AXLOGD("properties.drawOrder == true1 {}", pointSize);
         float pointSize4 = pointSize * 0.25f;
         Vec2 vec2Size4   = Vec2(pointSize4, pointSize4);
 
@@ -1415,8 +1416,9 @@ void DrawNode::_drawPoint(const Vec2& position,
         return;
     }
 
-    if (properties.drawOrder == true)
+    if (pointSize > 1.0f)
     {
+        AXLOGD("pointSize > 1 {}", pointSize);
         float pointSize4 = pointSize * 0.25f;
         Vec2 origin      = position - Vec2(pointSize4, pointSize4);
         Vec2 destination = position + Vec2(pointSize4, pointSize4);
@@ -1425,10 +1427,11 @@ void DrawNode::_drawPoint(const Vec2& position,
     }
     else
     {
+        AXLOGD("PETER2 {}", pointSize);
         auto point = expandBufferAndGetPointer(_points, 1);
         _pointsDirty = true;
 
-        *point             = {position, color, Vec2(pointSize, 0.0f)};
+        *point = {position, color, Vec2(pointSize, 0.0f)};
     }
 }
 
