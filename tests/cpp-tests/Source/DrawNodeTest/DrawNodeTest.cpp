@@ -1404,6 +1404,8 @@ DrawNodeTests::DrawNodeTests()
     ADD_TEST_CASE(DrawNodeSolidCircleTest);
     ADD_TEST_CASE(DrawNodePolygonTest);
 
+    ADD_TEST_CASE(DrawNodePointTest);
+
     ADD_TEST_CASE(DrawNodeSpLinesTest);
     ADD_TEST_CASE(DrawNodeSpLinesOpenClosedTest);
     ADD_TEST_CASE(DrawNodeAxmolTest2);
@@ -3887,6 +3889,41 @@ void DrawNodeSpLinesOpenClosedTest::update(float dt)
     drawNode->drawCardinalSpline(array, 0.0f, static_cast<int>(points.size() * 20), Color4F::GREEN, 4.0f, true);
     drawNode->drawCardinalSpline(array, 0.0f, static_cast<int>(points.size() * 20), Color4F::RED, 4.0f, false);
 }
+
+DrawNodePointTest::DrawNodePointTest()
+{
+    scheduleUpdate();
+}
+
+std::string DrawNodePointTest::title() const
+{
+    return "Performance: POINT";
+}
+
+std::string DrawNodePointTest::subtitle() const
+{
+    return "";
+}
+
+void DrawNodePointTest::update(float dt)
+{
+    drawNode->clear();
+    DrawNodeBaseTest::update(dt);
+
+    static float WID = g_resourceSize.width;
+    static float HIG = g_resourceSize.height;
+    for (unsigned int y = 0; y < HIG; y++)
+    {
+        for (unsigned int x = 0; x < WID; x++)
+        {
+            Vec2 pos = {(float)x, (float)y};
+            drawNode->drawPoint(pos, 2,Color4F::RED, ax::DrawNode::Circle);
+        }
+    }
+}
+
+
+
 
 #if defined(AX_PLATFORM_PC)
 CandyMixEeffect::CandyMixEeffect()

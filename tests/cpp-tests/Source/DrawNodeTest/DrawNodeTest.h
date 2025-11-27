@@ -491,6 +491,20 @@ private:
     ax::PointArray* array;
 };
 
+
+class DrawNodePointTest : public DrawNodeBaseTest
+{
+public:
+    CREATE_FUNC(DrawNodePointTest);
+
+    DrawNodePointTest();
+
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+
+    void update(float dt) override;
+};
+
 #if defined(AX_PLATFORM_PC)
 class CandyMixEeffect : public DrawNodeBaseTest
 {
