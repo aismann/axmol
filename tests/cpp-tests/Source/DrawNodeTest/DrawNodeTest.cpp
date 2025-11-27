@@ -1404,7 +1404,7 @@ DrawNodeTests::DrawNodeTests()
     ADD_TEST_CASE(DrawNodeSolidCircleTest);
     ADD_TEST_CASE(DrawNodePolygonTest);
 
-    ADD_TEST_CASE(DrawNodePointTest);
+
 
     ADD_TEST_CASE(DrawNodeSpLinesTest);
     ADD_TEST_CASE(DrawNodeSpLinesOpenClosedTest);
@@ -1412,6 +1412,7 @@ DrawNodeTests::DrawNodeTests()
 
 #if defined(AX_PLATFORM_PC)
     ADD_TEST_CASE(CandyMixEeffect);
+    ADD_TEST_CASE(DrawNodePointTest);
 #endif
     ADD_TEST_CASE(DrawNodePictureTest);
     ADD_TEST_CASE(DrawNodeJellyFishTest);
@@ -3890,6 +3891,8 @@ void DrawNodeSpLinesOpenClosedTest::update(float dt)
     drawNode->drawCardinalSpline(array, 0.0f, static_cast<int>(points.size() * 20), Color4F::RED, 4.0f, false);
 }
 
+
+#if defined(AX_PLATFORM_PC)
 DrawNodePointTest::DrawNodePointTest()
 {
     scheduleUpdate();
@@ -3907,14 +3910,14 @@ std::string DrawNodePointTest::subtitle() const
 
 void DrawNodePointTest::update(float dt)
 {
+    Vec2 visibleSize = Director::getInstance()->getVisibleSize();
+
     drawNode->clear();
     DrawNodeBaseTest::update(dt);
 
-    static float WID = g_resourceSize.width;
-    static float HIG = g_resourceSize.height;
-    for (unsigned int y = 0; y < HIG; y++)
+    for (unsigned int y = 0; y < visibleSize.height; y++)
     {
-        for (unsigned int x = 0; x < WID; x++)
+        for (unsigned int x = 0; x < visibleSize.width; x++)
         {
             Vec2 pos = {(float)x, (float)y};
             drawNode->drawPoint(pos, 2,Color4F::RED, ax::DrawNode::Circle);
@@ -3923,9 +3926,6 @@ void DrawNodePointTest::update(float dt)
 }
 
 
-
-
-#if defined(AX_PLATFORM_PC)
 CandyMixEeffect::CandyMixEeffect()
 {
     static const float BUTTON_WIDTH = 30;

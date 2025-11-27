@@ -491,7 +491,7 @@ private:
     ax::PointArray* array;
 };
 
-
+#if defined(AX_PLATFORM_PC)
 class DrawNodePointTest : public DrawNodeBaseTest
 {
 public:
@@ -505,7 +505,6 @@ public:
     void update(float dt) override;
 };
 
-#if defined(AX_PLATFORM_PC)
 class CandyMixEeffect : public DrawNodeBaseTest
 {
 public:
