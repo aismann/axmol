@@ -3583,29 +3583,88 @@ std::string DrawNodeRoundRectTest::subtitle() const
 
 DrawNodeButtonTest::DrawNodeButtonTest()
 {
-    // drawNode = DrawNode::create();
-    // addChild(drawNode);
-    // drawNode->setAnchorPoint(Vec2(0.5f, 0.5f));
-    //  drawNode->drawRect(Vec2(123, 123), Vec2(227, 227), Color(1, 1, 0, 1), 2);
-    //  drawNode->drawRect(Vec2(115, 130), Vec2(130, 115), Vec2(115, 100), Vec2(100, 115), Color::MAGENTA, 2);
-    for (int i = 0; i < 10; i++)
-    {
-        drawNode->drawRoundedRect(Vec2(115, 130), Vec2(130, 115), 40, Color4F::GREEN, Color4F::GREEN, 2);
-        drawNode->drawRoundedRect(Vec2(10, 50), Vec2(227, 70), 20, Color4F::YELLOW, Color4F::GREEN, 2);
-        drawNode->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY, Color4F::GREEN, 2);
-    }
+    auto layer = Layer::create();
+    addChild(layer);
+
+    // Create the stencil shape (e.g., a circle),
+    auto stencil = DrawNode::create();
+    stencil->drawRoundedRect(Vec2(115, 130), Vec2(100, 40), 10, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
+    //    stencil->setPosition(Vec2(240, 160));  // Center of screen
+
+    //// Create the content to be clipped "D:\_git\axmol3org\tests\cpp-tests\Content\Images\pattern1.png"
+    // "D:\_git\axmol3org\tests\cpp-tests\Content\hd\Images\MagentaSquare.png"
+    auto sprite = Sprite::create("hd/Images/MagentaSquare.png");
+    sprite->setPosition(Vec2(115, 130));
+    sprite->setScaleX(2.5);
+    // Create the clipping node
+    auto clipper = ClippingNode::create();
+    clipper->setStencil(stencil);
+    clipper->setInverted(false);        // Set to true to invert the mask
+    clipper->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
+    clipper->addChild(sprite);
+    layer->addChild(clipper);
+
+    auto stencil1 = DrawNode::create();
+    stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
+    sprite = Sprite::create("hd/Images/CyanSquare.png");
+    sprite->setPosition(Vec2(215, 60));
+    sprite->setScaleX(4.5);
+    sprite->setScaleY(1.5);
+    // Create the clipping node
+    auto clipper1 = ClippingNode::create();
+    clipper1->setStencil(stencil1);
+    clipper1->setInverted(false);        // Set to true to invert the mask
+    clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
+    clipper1->addChild(sprite);
+
+    layer->addChild(clipper1);
+
+    //
+
+    // auto stencil1 = DrawNode::create();
+    // stencil1->drawSolidCircle(Vec2(0, 0), 10, 0, 36, Color(1, 1, 1, 1));
+    // stencil->setPosition(Vec2(240, 160));  // Center of screen
+    // auto clipper1 = ClippingNode::create();
+    // clipper1->setStencil(stencil1);
+    // clipper1->setInverted(true);        // Set to true to invert the mask
+    // clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
+    // clipper1->addChild(clipper);
+
+    auto renderTex = RenderTexture::create(256, 256);
+
+    const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+
+    renderTex->beginWithClear(0, 0, 0, 0);
+
+    Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
+
+    Color4F bottomColor(1, 0, 0, 1);  // Red
+    Color4F topColor(0, 0, 1, 1);     // Blue
+
+    Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
+
+    drawNode = DrawNode::create();
+    drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
+
+    drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
+    renderTex->end();
+
+    // Create a sprite from the texture
+    auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
+    gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
+    gradientSprite->setPosition(Vec2(240, 160));
+    addChild(gradientSprite);
 }
 
 std::string DrawNodeButtonTest::title() const
 {
-    return "Example Button Test";
+    return "Example Button";
 }
 
 std::string DrawNodeButtonTest::subtitle() const
 {
     return "";
 }
-
 
 DrawNodeCircleTest::DrawNodeCircleTest()
 {
