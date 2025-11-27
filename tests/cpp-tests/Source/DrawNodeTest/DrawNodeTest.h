@@ -471,6 +471,29 @@ public:
     virtual std::string subtitle() const override;
 };
 
+
+class DrawNodeRoundRectTest : public DrawNodeBaseTest
+{
+public:
+    CREATE_FUNC(DrawNodeRoundRectTest);
+
+    DrawNodeRoundRectTest();
+
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+};
+
+class DrawNodeButtonTest : public DrawNodeBaseTest
+{
+public:
+    CREATE_FUNC(DrawNodeButtonTest);
+
+    DrawNodeButtonTest();
+
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+};
+
 class DrawNodeSpLinesOpenClosedTest : public DrawNodeBaseTest
 {
 public:

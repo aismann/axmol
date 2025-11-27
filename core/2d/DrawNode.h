@@ -148,6 +148,14 @@ public:
      */
     void drawRect(const Vec2& origin, const Vec2& destination, const Color4F& color, float thickness = 1.0f);
 
+
+    void drawRoundedRect(const Vec2& origin,
+                         const Vec2& size,
+                         float radius,
+                         const Color4F& fillColor,
+                         const Color4F& borderColor,
+                         float thickness = 1.0f);
+
     /** Draws a polygon given a pointer to point coordinates and the number of vertices measured in points.
      * The polygon can be closed or open.
      *

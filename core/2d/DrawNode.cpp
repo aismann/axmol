@@ -582,6 +582,49 @@ namespace ax
         _drawPoly(line, 5, false, color, thickness, true);
     }
 
+
+    void DrawNode::drawRoundedRect(const Vec2& origin,
+                                   const Vec2& destination,
+                                   float radius,
+                                   const Color4F& fillColor,
+                                   const Color4F& borderColor,
+                                   float thickness)
+    {
+        const int segments = 16;  // smoothness of corners
+        Vec2 rect[4]       = {origin + Vec2(radius, radius), origin + Vec2(destination.width - radius, radius),
+                              origin + Vec2(destination.width - radius, destination.height - radius),
+                              origin + Vec2(radius, destination.height - radius)};
+
+        // Center points of the 4 arcs
+        Vec2 centers[4] = {rect[0], rect[1], rect[2], rect[3]};
+
+        float angles[4][2] = {
+            {(float)M_PI, 1.5f * (float)M_PI},      // bottom-left
+            {1.5f * (float)M_PI, 2 * (float)M_PI},  // bottom-right
+            {0, 0.5f * (float)M_PI},                // top-right
+            {0.5f * (float)M_PI, (float)M_PI}       // top-left
+        };
+
+        // Draw filled rounded rect
+        drawSolidRect(origin + Vec2(radius, 0), origin + Vec2(destination.width - radius, destination.height),
+                      fillColor);
+        drawSolidRect(origin + Vec2(0, radius), origin + Vec2(destination.width, destination.height - radius),
+                      fillColor);
+
+        for (int i = 0; i < 4; i++)
+        {
+            drawSolidCircle(centers[i], radius, 0, segments + radius, fillColor);
+        }
+
+        // Optional: outline
+        for (int i = 0; i < 4; i++)
+        {
+            //    drawPie(centers[i], radius, angles[i][0], angles[i][1] - angles[i][0], segments, borderColor);
+        }
+    }
+
+
+
     void DrawNode::drawSegment(const Vec2& from,
         const Vec2& to,
         float thickness,
