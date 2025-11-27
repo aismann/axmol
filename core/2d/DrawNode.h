@@ -337,6 +337,12 @@ public:
                        float thickness            = 0,
                        const Color4F& borderColor = Color4F(0, 0, 0, 0));
 
+    // drawNode 3.0
+        void drawSolidRect(const ax::Rect& origin,
+                       const Color4F& color,
+                       float thickness            = 0,
+                       const Color4F& borderColor = Color4F(0, 0, 0, 0));
+
     /** Draws a solid polygon given a pointer to CGPoint coordinates, the number of vertices measured in points, and a
      * color.
      *
@@ -399,6 +405,12 @@ public:
      * @param color The solid circle color.
      */
     void drawSolidCircle(const Vec2& center, float radius, float angle, unsigned int segments, const Color4F& color);
+
+    //  since DrawNode 3.0
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, float angle = 0);
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, Vec2 angle = Vec2(-1, 0));
+    void _drawSolidCircle(const Vec2& center, float angle, const Color4F& fillColor, float radius = 0);
+    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle = {-1, 0});
 
     /** Draws a pie given the center, radius, angle, start angle, end angle  and number of segments.
      * @param center The circle center point.

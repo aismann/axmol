@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include "renderer/Renderer.h"
 #include "renderer/CustomCommand.h"
 
+#include <chrono>
+
 #if defined(_WIN32)
 #    pragma push_macro("TRANSPARENT")
 #    undef TRANSPARENT
@@ -3586,6 +3588,14 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     auto layer = Layer::create();
     addChild(layer);
 
+    //// Make a reference grid so distortion is visible
+    //auto draw = DrawNode::create();
+    //for (int x = -300; x <= 300; x += 30)
+    //    draw->drawLine(Vec2(x, -300), Vec2(x, 300), Color4F(0.2f, 0.2f, 0.2f, 1));
+    //for (int y = -300; y <= 300; y += 30)
+    //    draw->drawLine(Vec2(-300, y), Vec2(300, y), Color4F(0.2f, 0.2f, 0.2f, 1));
+    //addChild(draw);
+
     // Create the stencil shape (e.g., a circle),
     auto stencil = DrawNode::create();
     stencil->drawRoundedRect(Vec2(115, 130), Vec2(100, 40), 10, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
@@ -3658,7 +3668,7 @@ DrawNodeButtonTest::DrawNodeButtonTest()
 
 std::string DrawNodeButtonTest::title() const
 {
-    return "Example Button";
+    return "Example: Button";
 }
 
 std::string DrawNodeButtonTest::subtitle() const
@@ -3704,14 +3714,69 @@ std::string DrawNodeCircleTest::subtitle() const
 
 DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
 {
-    float radius = 40;
-    for (int i = 0; i < 10000; i++)
+    fast = false;
+
+    showCircles();
+
+    autoTestLabel     = Label::createWithTTF("Slow is on ", "fonts/arial.ttf", 16);
+    auto autoTestItem = MenuItemLabel::create(autoTestLabel, [=](Object* sender) {
+        if (fast)
+        {
+            fast = false;
+            showCircles();
+        }
+        else
+        {
+            fast = true;
+            showCircles();
+        }
+    });
+
+    autoTestItem->setPosition(Vec2(VisibleRect::center().x, VisibleRect::top().y - 100));
+
+    auto menu = Menu::create(autoTestItem, nullptr);
+    menu->setPosition(Vec2::ZERO);
+    addChild(menu, 1);
+}
+void DrawNodeSolidCircleTest::showCircles()
+{
+    static float radius = 80;
+    drawNode->clear();
+
+    Vec2 pos = VisibleRect::center() + Vec2(200, 0);
+    ;
+    Color4F color = Color4F::GRAY;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    // drawNode->setBlendFunc(BlendFunc::DISABLE);
+    for (int i = 0; i < 20000; i++)
     {
-        Vec2 pos = VisibleRect::center() + Vec2((VisibleRect::center().x - 50) * AXRANDOM_MINUS1_1(),
-                                                (VisibleRect::center().y - 50) * AXRANDOM_MINUS1_1());
-        drawNode->drawSolidCircle(pos, radius, 0, 36,
-                                  Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f));
+        Vec2 pos      = VisibleRect::center() + Vec2((VisibleRect::center().x - radius) * AXRANDOM_MINUS1_1(),
+                                                     (VisibleRect::center().y - radius) * AXRANDOM_MINUS1_1());
+        Color4F color = Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f);
+        if (fast)
+        {
+            drawNode->drawSolidCircle(pos, radius, color, AXRANDOM_MINUS1_1() * 360);
+        }
+        else
+        {
+            drawNode->drawDot(pos, radius, color);
+            //   drawNode->drawSegment(center),cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body),
+            //   radius))), 1.0, color);
+            //  drawNode->drawSolidCircle(pos, radius, 0, 36, color);
+        }
     }
+    auto end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    if (autoTestLabel)
+    {
+        std::string text = std::to_string(duration.count());
+        text.append(" ms");
+        autoTestLabel->setString(text);
+    }
+
+    rect = {190, 205, 100, 30};
+    drawNode->drawSolidRect(rect, (fast) ? Color4F::GREEN : Color4F::RED);
 }
 
 std::string DrawNodeSolidCircleTest::title() const
@@ -3721,8 +3786,34 @@ std::string DrawNodeSolidCircleTest::title() const
 
 std::string DrawNodeSolidCircleTest::subtitle() const
 {
-    return "10000 Circles";
+    return "20000 Circles (red/green is slow/fast)\nPress the rect below for switch slow/fast";
 }
+
+
+
+
+
+//DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
+//{
+//    float radius = 40;
+//    for (int i = 0; i < 10000; i++)
+//    {
+//        Vec2 pos = VisibleRect::center() + Vec2((VisibleRect::center().x - 50) * AXRANDOM_MINUS1_1(),
+//                                                (VisibleRect::center().y - 50) * AXRANDOM_MINUS1_1());
+//        drawNode->drawSolidCircle(pos, radius, 0, 36,
+//                                  Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f));
+//    }
+//}
+//
+//std::string DrawNodeSolidCircleTest::title() const
+//{
+//    return "SolidCircle Stress Test";
+//}
+//
+//std::string DrawNodeSolidCircleTest::subtitle() const
+//{
+//    return "10000 Circles";
+//}
 
 DrawNodePlayground::DrawNodePlayground()
 {
