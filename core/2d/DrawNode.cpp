@@ -613,7 +613,7 @@ namespace ax
 
         for (int i = 0; i < 4; i++)
         {
-            drawSolidCircle(centers[i], radius, 0, segments + radius, fillColor);
+            drawSolidCircle(centers[i], radius-1, 0, segments + radius, fillColor);
         }
 
         // Optional: outline
