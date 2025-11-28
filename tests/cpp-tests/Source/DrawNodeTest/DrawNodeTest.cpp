@@ -3618,19 +3618,18 @@ DrawNodeButtonTest::DrawNodeButtonTest()
 
     auto stencil1 = DrawNode::create();
     stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
-    sprite = Sprite::create("hd/Images/CyanSquare.png");
-    sprite->setPosition(Vec2(215, 60));
-    sprite->setScaleX(4.5);
-    sprite->setScaleY(1.5);
+    auto sprite1 = Sprite::create("hd/Images/CyanSquare.png");
+    sprite1->setPosition(Vec2(215, 60));
+    sprite1->setScaleX(4.5);
+    sprite1->setScaleY(1.5);
     // Create the clipping node
     auto clipper1 = ClippingNode::create();
     clipper1->setStencil(stencil1);
     clipper1->setInverted(false);        // Set to true to invert the mask
     clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-    clipper1->addChild(sprite);
+    clipper1->addChild(sprite1);
 
     layer->addChild(clipper1);
-
 
 
 
@@ -3641,7 +3640,9 @@ DrawNodeButtonTest::DrawNodeButtonTest()
         {
         case 0:
         {
-            clipper1->setColor(Color3B::BLUE);
+            auto col = sprite1->getColor();
+            sprite->setColor(Color3B::BLUE);
+         //   sprite1->setColor(Color3B::BLUE);
             break;
         }
         case 1:
