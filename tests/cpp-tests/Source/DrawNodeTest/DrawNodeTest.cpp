@@ -3618,6 +3618,8 @@ DrawNodeButtonTest::DrawNodeButtonTest()
 
     auto stencil1 = DrawNode::create();
     stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
+    auto stencil2 = DrawNode::create();
+    stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
     auto sprite1 = Sprite::create("hd/Images/CyanSquare.png");
     sprite1->setPosition(Vec2(215, 60));
     sprite1->setScaleX(4.5);
@@ -3640,8 +3642,8 @@ DrawNodeButtonTest::DrawNodeButtonTest()
         {
         case 0:
         {
-            auto col = sprite1->getColor();
-            sprite->setColor(Color3B::BLUE);
+            auto col = stencil2->getColor();
+            stencil2->setColor(Color3B::BLUE);
          //   sprite1->setColor(Color3B::BLUE);
             break;
         }
