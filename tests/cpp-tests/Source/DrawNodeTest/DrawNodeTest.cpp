@@ -3587,7 +3587,7 @@ DrawNodeButtonTest::DrawNodeButtonTest()
 {
     static int buttonStatus[3];
 
-        auto layer = Layer::create();
+    auto layer = Layer::create();
     addChild(layer);
 
     //// Make a reference grid so distortion is visible
@@ -3619,32 +3619,49 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     auto stencil1 = DrawNode::create();
     stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
     auto stencil2 = DrawNode::create();
-    stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
-    auto sprite1 = Sprite::create("hd/Images/CyanSquare.png");
+    // stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
+
+    Color4F bright           = Color4F(1, 0, 0, 1);
+    Color4F dark             = Color4F(0.2, 0, 0, 1);
+    static Color4F color3[]  = {bright, bright, dark};
+    static Color4F color31[] = {dark, dark, bright};
+
+    Vec2 triangle[]  = {{215, 120}, {415, 120}, {215, 60}};
+    Vec2 triangle1[] = {{215, 60}, {415, 60}, {415, 120}};
+
+    stencil2->drawColoredTriangle(triangle, color3);
+    stencil2->drawColoredTriangle(triangle1, color31);
+    // float thick = 2.0f;
+    // for (unsigned int i = 0; i < 100; i++)
+    //{
+    //     float a = (float)i;
+    //     stencil2->drawLine(Vec2(215, 30 + i * thick), Vec2(415, 30 + i * thick), Color4F(1 - (a / 100), 1, 1, 1),
+    //                        thick * 2);
+    // }
+    auto sprite1 = Sprite::create("marble_0017_color_1k.jpg");
     sprite1->setPosition(Vec2(215, 60));
-    sprite1->setScaleX(4.5);
-    sprite1->setScaleY(1.5);
-    // Create the clipping node
+    // sprite1->setScaleX(1.5);
+    // sprite1->setScaleY(1.5);
+    //  Create the clipping node
     auto clipper1 = ClippingNode::create();
     clipper1->setStencil(stencil1);
     clipper1->setInverted(false);        // Set to true to invert the mask
     clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-    clipper1->addChild(sprite1);
+    clipper1->addChild(stencil2);
 
     layer->addChild(clipper1);
 
+    auto autoTestLabel = Label::createWithTTF("Button1", "fonts/arial.ttf", 16);
 
-
-
-    auto autoTestLabel = Label::createWithTTF("Button1 ", "fonts/arial.ttf", 16);
-    auto autoTestItem  = MenuItemLabel::create(autoTestLabel, [=](Object* sender) {
+    auto autoTestItem = MenuItemLabel::create(autoTestLabel, [=](Object* sender) {
         switch (buttonStatus[0])
         {
         case 0:
         {
+
             auto col = stencil2->getColor();
             stencil2->setColor(Color3B::BLUE);
-         //   sprite1->setColor(Color3B::BLUE);
+            //   sprite1->setColor(Color3B::BLUE);
             break;
         }
         case 1:
@@ -3679,83 +3696,93 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     menu->setPosition(Vec2::ZERO);
     addChild(menu, 3);
 
-
-    auto autoTestLabel1 = Label::createWithTTF("Button2", "fonts/arial.ttf", 16);
+    auto autoTestLabel1 = Label::createWithTTF("Button2", "fonts/arial.ttf", 16, {200, 60}, TextHAlignment::CENTER,
+                                               TextVAlignment::CENTER);
     auto autoTestItem1  = MenuItemLabel::create(autoTestLabel1, [=](Object* sender) {
         switch (buttonStatus[0])
         {
         case 0:
         {
+            stencil2->clear();
+            stencil2->drawColoredTriangle(triangle, color31);
+            stencil2->drawColoredTriangle(triangle1, color3);
 
-            break;
+            scheduleOnce([=](float) {
+                stencil2->clear();
+                stencil2->drawColoredTriangle(triangle, color3);
+                stencil2->drawColoredTriangle(triangle1, color31);
+            }, 0.1, "update_font_size");
+        
+        break;
         }
-        case 1:
-        {
-            break;
+    case 1:
+    {
+        break;
+    }
+    case 2:
+    {
+        break;
+    }
+
+    default:
+        break;
         }
-        case 2:
-        {
-            break;
-        }
 
-        default:
-            break;
-        }
+    // if (buttonStatus[0] == 0)
+    //{
+    //     buttonStatus[0] = 1;;
+    //     showCircles();
+    // }
+    // else
+    //{
+    //     fast = true;
+    //     showCircles();
+    // }
+});
+//  autoTestItem1->setAnchorPoint({0, 0});
+autoTestItem1->setPosition(Vec2(215, 60) + Vec2(200, 60) / 2);
 
-        // if (buttonStatus[0] == 0)
-        //{
-        //     buttonStatus[0] = 1;;
-        //     showCircles();
-        // }
-        // else
-        //{
-        //     fast = true;
-        //     showCircles();
-        // }
-    });
+auto menu1 = Menu::create(autoTestItem1, nullptr);
+menu1->setPosition(Vec2::ZERO);
 
-    autoTestItem1->setPosition(Vec2(215, 60) + Vec2(200, 60) / 2);
+// menu1->setContentSize({200, 60});
+addChild(menu1, 3);
 
-    auto menu1 = Menu::create(autoTestItem1, nullptr);
-    menu1->setPosition(Vec2::ZERO);
-    addChild(menu1, 3);
+//
 
+// auto stencil1 = DrawNode::create();
+// stencil1->drawSolidCircle(Vec2(0, 0), 10, 0, 36, Color(1, 1, 1, 1));
+// stencil->setPosition(Vec2(240, 160));  // Center of screen
+// auto clipper1 = ClippingNode::create();
+// clipper1->setStencil(stencil1);
+// clipper1->setInverted(true);        // Set to true to invert the mask
+// clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
+// clipper1->addChild(clipper);
 
-    //
+auto renderTex = RenderTexture::create(256, 256);
 
-    // auto stencil1 = DrawNode::create();
-    // stencil1->drawSolidCircle(Vec2(0, 0), 10, 0, 36, Color(1, 1, 1, 1));
-    // stencil->setPosition(Vec2(240, 160));  // Center of screen
-    // auto clipper1 = ClippingNode::create();
-    // clipper1->setStencil(stencil1);
-    // clipper1->setInverted(true);        // Set to true to invert the mask
-    // clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-    // clipper1->addChild(clipper);
+const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
-    auto renderTex = RenderTexture::create(256, 256);
+renderTex->beginWithClear(0, 0, 0, 0);
 
-    const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
 
-    renderTex->beginWithClear(0, 0, 0, 0);
+Color4F bottomColor(1, 0, 0, 1);  // Red
+Color4F topColor(0, 0, 1, 1);     // Blue
 
-    Vec2 verts[] = { Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256) };
+Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
 
-    Color4F bottomColor(1, 0, 0, 1);  // Red
-    Color4F topColor(0, 0, 1, 1);     // Blue
+drawNode = DrawNode::create();
+drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
 
-    Color4F colors[] = { bottomColor, bottomColor, topColor, topColor };
+drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
+renderTex->end();
 
-    drawNode = DrawNode::create();
-    drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
-
-    drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
-    renderTex->end();
-
-    // Create a sprite from the texture
-    auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
-    gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
-    gradientSprite->setPosition(Vec2(240, 160));
-    addChild(gradientSprite);
+// Create a sprite from the texture
+auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
+gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
+gradientSprite->setPosition(Vec2(240, 160));
+addChild(gradientSprite);
 }
 
 std::string DrawNodeButtonTest::title() const
