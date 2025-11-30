@@ -3875,14 +3875,15 @@ void DrawNodeSolidCircleTest::showCircles()
         Color4F color = Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f);
         if (fast)
         {
+            //   drawNode->drawSegment(center),cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body),
+            //   radius))), 1.0, color);
+            //  drawNode->drawSolidCircle(pos, radius, 0, 36, color);
             drawNode->drawSolidCircle(pos, radius, color, AXRANDOM_MINUS1_1() * 360);
         }
         else
         {
             drawNode->drawDot(pos, radius, color);
-            //   drawNode->drawSegment(center),cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body),
-            //   radius))), 1.0, color);
-            //  drawNode->drawSolidCircle(pos, radius, 0, 36, color);
+
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -4217,12 +4218,13 @@ DrawNodePointTest::DrawNodePointTest()
 
 //    _subtitle = "please wait";
 
-    for (unsigned int y = 0; y < visibleSize.height; y++)
+   int  delta = 1;
+    for (unsigned int y = 0; y < visibleSize.height; y += delta)
     {
-        for (unsigned int x = 0; x < visibleSize.width; x++)
+        for (unsigned int x = 0; x < visibleSize.width; x += delta)
         {
             Vec2 pos = {(float)x, (float)y};
-            drawNode->drawPoint(pos, 2, Color4F::RED, ax::DrawNode::Circle);
+            drawNode->drawPoint(pos, 5, Color4F::RED, ax::DrawNode::Circle);
         }
     }
    // scheduleUpdate();
