@@ -4210,7 +4210,22 @@ void DrawNodeSpLinesOpenClosedTest::update(float dt)
 #if defined(AX_PLATFORM_PC)
 DrawNodePointTest::DrawNodePointTest()
 {
-    scheduleUpdate();
+    Vec2 visibleSize = Director::getInstance()->getVisibleSize();
+
+    //drawNode->clear();
+    //DrawNodeBaseTest::update(dt);
+
+//    _subtitle = "please wait";
+
+    for (unsigned int y = 0; y < visibleSize.height; y++)
+    {
+        for (unsigned int x = 0; x < visibleSize.width; x++)
+        {
+            Vec2 pos = {(float)x, (float)y};
+            drawNode->drawPoint(pos, 2, Color4F::RED, ax::DrawNode::Circle);
+        }
+    }
+   // scheduleUpdate();
 }
 
 std::string DrawNodePointTest::title() const
@@ -4225,19 +4240,7 @@ std::string DrawNodePointTest::subtitle() const
 
 void DrawNodePointTest::update(float dt)
 {
-    Vec2 visibleSize = Director::getInstance()->getVisibleSize();
 
-    drawNode->clear();
-    DrawNodeBaseTest::update(dt);
-
-    for (unsigned int y = 0; y < visibleSize.height; y++)
-    {
-        for (unsigned int x = 0; x < visibleSize.width; x++)
-        {
-            Vec2 pos = {(float)x, (float)y};
-            drawNode->drawPoint(pos, 2, Color4F::RED, ax::DrawNode::Circle);
-        }
-    }
 }
 
 CandyMixEeffect::CandyMixEeffect()

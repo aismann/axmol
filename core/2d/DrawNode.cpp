@@ -1597,8 +1597,23 @@ namespace ax
     {
         if (pointType == PointType::Circle)
         {
-            float pointSize4 = pointSize * 0.25f;
-            _drawCircle(position, pointSize4, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
+            //float pointSize4 = pointSize * 0.25f;
+            //_drawCircle(position, pointSize4, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
+
+
+            unsigned int vertex_count = 2 * 3;
+            auto triangles =
+                reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, vertex_count));
+            _trianglesDirty = true;
+            float radius = pointSize/2;
+            V2F_C4B_T2F a   = {Vec2(position.x - radius, position.y - radius), color, Vec2(-1.0f, -1.0f)};
+            V2F_C4B_T2F b   = {Vec2(position.x - radius, position.y + radius), color, Vec2(-1.0f, 1.0f)};
+            V2F_C4B_T2F c   = {Vec2(position.x + radius, position.y + radius), color, Vec2(1.0f, 1.0f)};
+            V2F_C4B_T2F d   = {Vec2(position.x + radius, position.y - radius), color, Vec2(1.0f, -1.0f)};
+
+            triangles[0] = {a, b, c};
+            triangles[1] = {a, c, d};
+
         }
         else //  PointType::Rect
         {
