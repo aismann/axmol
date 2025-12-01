@@ -407,11 +407,12 @@ public:
     void drawSolidCircle(const Vec2& center, float radius, float angle, unsigned int segments, const Color4F& color);
 
     //  since DrawNode 3.0
-    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, float angle = 0.0f);
-    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, Vec2 angle = Vec2(-1, 0));
-    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, float angle = 0.0f);
-    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle = {-1, 0});
-
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, float angle);
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color, Vec2 angle);
+    void drawSolidCircle(const Vec2& center, float radius, const Color4F& color);
+    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, float angle);
+    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle);
+    void _drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor);
     /** Draws a pie given the center, radius, angle, start angle, end angle  and number of segments.
      * @param center The circle center point.
      * @param radius The circle rotate of radius.

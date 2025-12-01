@@ -3882,7 +3882,7 @@ void DrawNodeSolidCircleTest::showCircles()
         }
         else
         {
-            drawNode->drawDot(pos, radius, color);
+            drawNode->drawSolidCircle(pos, radius, color);
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -4234,7 +4234,7 @@ DrawNodePointTest::DrawNodePointTest()
                 color = Color4F::RED;
             }
             Vec2 pos = {(float)x+delta/2, (float)y+delta/2};
-            drawNode->drawPoint(pos, delta-1, color, ax::DrawNode::Rect);
+            drawNode->drawPoint(pos, delta-1, color, ax::DrawNode::Circle);
             xx++;
         }
         yy++;

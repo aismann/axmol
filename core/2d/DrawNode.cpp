@@ -798,6 +798,16 @@ void DrawNode::drawSolidCircle(const Vec2& center,
     _drawCircle(center, radius, angle, segments, false, 1.0f, 1.0f, Color4F(), color, true);
 }
 
+void DrawNode::drawSolidCircle(const Vec2& center, float radius, const Color4F& color)
+{
+    if (radius < 0.0f)
+    {
+        AXLOGW("{}: radius < 0, changed to 0", __FUNCTION__);
+        radius = 0.0f;
+    }
+    _drawSolidCircle(center, radius, color);
+}
+
 void DrawNode::drawSolidCircle(const Vec2& center, float radius, const Color4F& color, float angle)
 {
     if (radius < 0.0f)
@@ -1351,7 +1361,7 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
     _drawSolidCircle(center, radius, fillColor, n);
 }
 
-void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle)
+void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor)
 {
     auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 6));
     _trianglesDirty = true;
@@ -1363,10 +1373,16 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
     V2F_C4B_T2F d      = {Vec2(center.x + radius, center.y - radius), fillColor, Vec2(1.0f, -1.0f)};
     triangles[0]       = {a, b, c};
     triangles[1]       = {a, c, d};
+}
+
+void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle)
+{
+    _drawSolidCircle(center, radius, fillColor);
 
     auto line   = expandBufferAndGetPointer(_lines, 2);
     _linesDirty = true;
 
+    Color4F fillColor1 = fillColor + Color4F(0.51f, 0.5f, 0.5f, 0.0f);
     line[0] = {center, fillColor1, Vec2::ZERO};
     line[1] = {center + angle * radius, fillColor1, Vec2::ZERO};
 }
