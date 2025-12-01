@@ -3712,77 +3712,77 @@ DrawNodeButtonTest::DrawNodeButtonTest()
                 stencil2->drawColoredTriangle(triangle, color3);
                 stencil2->drawColoredTriangle(triangle1, color31);
             }, 0.1, "update_font_size");
-        
-        break;
-        }
-    case 1:
-    {
-        break;
-    }
-    case 2:
-    {
-        break;
-    }
 
-    default:
-        break;
+            break;
+        }
+        case 1:
+        {
+            break;
+        }
+        case 2:
+        {
+            break;
         }
 
-    // if (buttonStatus[0] == 0)
-    //{
-    //     buttonStatus[0] = 1;;
-    //     showCircles();
-    // }
-    // else
-    //{
-    //     fast = true;
-    //     showCircles();
-    // }
-});
-//  autoTestItem1->setAnchorPoint({0, 0});
-autoTestItem1->setPosition(Vec2(215, 60) + Vec2(200, 60) / 2);
+        default:
+            break;
+        }
 
-auto menu1 = Menu::create(autoTestItem1, nullptr);
-menu1->setPosition(Vec2::ZERO);
+        // if (buttonStatus[0] == 0)
+        //{
+        //     buttonStatus[0] = 1;;
+        //     showCircles();
+        // }
+        // else
+        //{
+        //     fast = true;
+        //     showCircles();
+        // }
+    });
+    //  autoTestItem1->setAnchorPoint({0, 0});
+    autoTestItem1->setPosition(Vec2(215, 60) + Vec2(200, 60) / 2);
 
-// menu1->setContentSize({200, 60});
-addChild(menu1, 3);
+    auto menu1 = Menu::create(autoTestItem1, nullptr);
+    menu1->setPosition(Vec2::ZERO);
 
-//
+    // menu1->setContentSize({200, 60});
+    addChild(menu1, 3);
 
-// auto stencil1 = DrawNode::create();
-// stencil1->drawSolidCircle(Vec2(0, 0), 10, 0, 36, Color(1, 1, 1, 1));
-// stencil->setPosition(Vec2(240, 160));  // Center of screen
-// auto clipper1 = ClippingNode::create();
-// clipper1->setStencil(stencil1);
-// clipper1->setInverted(true);        // Set to true to invert the mask
-// clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-// clipper1->addChild(clipper);
+    //
 
-auto renderTex = RenderTexture::create(256, 256);
+    // auto stencil1 = DrawNode::create();
+    // stencil1->drawSolidCircle(Vec2(0, 0), 10, 0, 36, Color(1, 1, 1, 1));
+    // stencil->setPosition(Vec2(240, 160));  // Center of screen
+    // auto clipper1 = ClippingNode::create();
+    // clipper1->setStencil(stencil1);
+    // clipper1->setInverted(true);        // Set to true to invert the mask
+    // clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
+    // clipper1->addChild(clipper);
 
-const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+    auto renderTex = RenderTexture::create(256, 256);
 
-renderTex->beginWithClear(0, 0, 0, 0);
+    const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
-Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
+    renderTex->beginWithClear(0, 0, 0, 0);
 
-Color4F bottomColor(1, 0, 0, 1);  // Red
-Color4F topColor(0, 0, 1, 1);     // Blue
+    Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
 
-Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
+    Color4F bottomColor(1, 0, 0, 1);  // Red
+    Color4F topColor(0, 0, 1, 1);     // Blue
 
-drawNode = DrawNode::create();
-drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
+    Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
 
-drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
-renderTex->end();
+    drawNode = DrawNode::create();
+    drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
 
-// Create a sprite from the texture
-auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
-gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
-gradientSprite->setPosition(Vec2(240, 160));
-addChild(gradientSprite);
+    drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
+    renderTex->end();
+
+    // Create a sprite from the texture
+    auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
+    gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
+    gradientSprite->setPosition(Vec2(240, 160));
+    addChild(gradientSprite);
 }
 
 std::string DrawNodeButtonTest::title() const
@@ -3859,7 +3859,7 @@ DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
 }
 void DrawNodeSolidCircleTest::showCircles()
 {
-    static float radius = 80;
+    static float radius = 40;
     drawNode->clear();
 
     Vec2 pos = VisibleRect::center() + Vec2(200, 0);
@@ -3883,7 +3883,6 @@ void DrawNodeSolidCircleTest::showCircles()
         else
         {
             drawNode->drawDot(pos, radius, color);
-
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
@@ -4213,21 +4212,34 @@ DrawNodePointTest::DrawNodePointTest()
 {
     Vec2 visibleSize = Director::getInstance()->getVisibleSize();
 
-    //drawNode->clear();
-    //DrawNodeBaseTest::update(dt);
+    // drawNode->clear();
+    // DrawNodeBaseTest::update(dt);
 
-//    _subtitle = "please wait";
-
-   int  delta = 1;
+    //    _subtitle = "please wait";
+    Color4F color = Color4F::RED;
+    int delta     = 10;
+    int xx        = 0;
+    int yy        = 0;
     for (unsigned int y = 0; y < visibleSize.height; y += delta)
     {
+        color = Color4F::RED;
+        if (y % 3 == 0)
+        {
+            color = Color4F::BLUE;
+        }
         for (unsigned int x = 0; x < visibleSize.width; x += delta)
         {
-            Vec2 pos = {(float)x, (float)y};
-            drawNode->drawPoint(pos, 5, Color4F::RED, ax::DrawNode::Circle);
+            if (x % 4 == 0)
+            {
+                color = Color4F::RED;
+            }
+            Vec2 pos = {(float)x+delta/2, (float)y+delta/2};
+            drawNode->drawPoint(pos, delta-1, color, ax::DrawNode::Rect);
+            xx++;
         }
+        yy++;
     }
-   // scheduleUpdate();
+    // scheduleUpdate();
 }
 
 std::string DrawNodePointTest::title() const
@@ -4240,10 +4252,7 @@ std::string DrawNodePointTest::subtitle() const
     return "";
 }
 
-void DrawNodePointTest::update(float dt)
-{
-
-}
+void DrawNodePointTest::update(float dt) {}
 
 CandyMixEeffect::CandyMixEeffect()
 {
