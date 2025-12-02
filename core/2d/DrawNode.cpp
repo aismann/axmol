@@ -1377,14 +1377,43 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
 
 void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle)
 {
-    _drawSolidCircle(center, radius, fillColor);
+    if (0)
+    {
+        auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 6));
+        _trianglesDirty = true;
 
-    auto line   = expandBufferAndGetPointer(_lines, 2);
-    _linesDirty = true;
+        V2F_C4B_T2F a      = {Vec2(center.x - radius, center.y - radius), fillColor, Vec2(-1.0f, -1.0f)};
+        V2F_C4B_T2F b      = {Vec2(center.x - radius, center.y + radius), fillColor, Vec2(-1.0f, 1.0f)};  // TOP_LEFT
+        V2F_C4B_T2F c      = {Vec2(center.x + radius, center.y + radius), fillColor, Vec2(1.0f, 1.0f)};
+        V2F_C4B_T2F d      = {Vec2(center.x + radius, center.y - radius), fillColor, Vec2(1.0f, -1.0f)};
 
-    Color4F fillColor1 = fillColor + Color4F(0.51f, 0.5f, 0.5f, 0.0f);
-    line[0] = {center, fillColor1, Vec2::ZERO};
-    line[1] = {center + angle * radius, fillColor1, Vec2::ZERO};
+        triangles[0]       = {a, b, c};
+        triangles[1]       = {a, c, d};
+        auto line   = expandBufferAndGetPointer(_lines, 2);
+        _linesDirty = true;
+
+        Color4F fillColor1 = fillColor + Color4F(0.51f, 0.5f, 0.5f, 0.0f);
+        line[0] = {center, fillColor1, Vec2::ZERO};
+        line[1] = {center + angle * radius, fillColor1, Vec2::ZERO};
+    }
+    else
+    {
+        auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 9));
+        _trianglesDirty = true;
+
+        V2F_C4B_T2F a      = {Vec2(center.x - radius, center.y - radius), fillColor, Vec2(-1.0f, -1.0f)};
+        V2F_C4B_T2F b      = {Vec2(center.x - radius, center.y + radius), fillColor, Vec2(-1.0f, 1.0f)};  // TOP_LEFT
+        V2F_C4B_T2F c      = {Vec2(center.x + radius, center.y + radius), fillColor, Vec2(1.0f, 1.0f)};
+        V2F_C4B_T2F d      = {Vec2(center.x + radius, center.y - radius), fillColor, Vec2(1.0f, -1.0f)};
+
+        triangles[0]       = {a, b, c};
+        triangles[1]       = {a, c, d};
+        Color4F fillColor1 = fillColor + Color4F(0.51f, 0.5f, 0.5f, 0.0f);
+        V2F_C4B_T2F e      = {center-Vec2(1,1), fillColor1, Vec2::ZERO};
+        V2F_C4B_T2F f      = {center + angle * radius, fillColor1, Vec2::ZERO};
+        V2F_C4B_T2F g      = {center+Vec2(1,1), fillColor1, Vec2::ZERO};
+        triangles[2]       = {g, e, f};
+    }
 }
 
 void DrawNode::_drawColoredTriangle(Vec2* vertices3, const Color4F* color3)

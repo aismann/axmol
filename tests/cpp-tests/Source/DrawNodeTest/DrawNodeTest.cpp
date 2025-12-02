@@ -3868,7 +3868,7 @@ void DrawNodeSolidCircleTest::showCircles()
 
     auto start = std::chrono::high_resolution_clock::now();
     // drawNode->setBlendFunc(BlendFunc::DISABLE);
-    for (int i = 0; i < 20000; i++)
+    for (int i = 0; i < 200000; i++)
     {
         Vec2 pos      = VisibleRect::center() + Vec2((VisibleRect::center().x - radius) * AXRANDOM_MINUS1_1(),
                                                      (VisibleRect::center().y - radius) * AXRANDOM_MINUS1_1());
