@@ -608,8 +608,8 @@ void DrawNode::drawRoundedRect(const Vec2& origin,
 
     for (int i = 0; i < 4; i++)
     {
-        drawSolidCircle(centers[i], radius, 0, segments + radius, fillColor);
-//        _drawSolidCircle(centers[i], radius,  fillColor);
+    //    drawSolidCircle(centers[i], radius, 0, segments + radius, fillColor);
+        _drawPoint(centers[i], radius,  fillColor,PointType::Circle);
     }
 
     // Optional: outline
@@ -1544,7 +1544,7 @@ void DrawNode::_drawPoint(const Vec2& position,
     //  old DrawNode2.0
     // if (pointType == PointType::Circle)
     //{
-    //     //float pointSize4 = pointSize * 0.25f;
+    radius = radius * 0.25f;
     //     //_drawCircle(position, pointSize4, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
 
     //
