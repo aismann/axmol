@@ -3619,7 +3619,7 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     auto stencil1 = DrawNode::create();
     stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
     auto stencil2 = DrawNode::create();
-    // stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
+  //  stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
 
     Color4F bright           = Color4F(1, 0, 0, 1);
     Color4F dark             = Color4F(0.2, 0, 0, 1);
@@ -3859,7 +3859,7 @@ DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
 }
 void DrawNodeSolidCircleTest::showCircles()
 {
-    static float radius = 40;
+    static float radius = 20;
     drawNode->clear();
 
     Vec2 pos = VisibleRect::center() + Vec2(200, 0);
@@ -3868,7 +3868,7 @@ void DrawNodeSolidCircleTest::showCircles()
 
     auto start = std::chrono::high_resolution_clock::now();
     // drawNode->setBlendFunc(BlendFunc::DISABLE);
-    for (int i = 0; i < 200000; i++)
+    for (int i = 0; i < 20000; i++)
     {
         Vec2 pos      = VisibleRect::center() + Vec2((VisibleRect::center().x - radius) * AXRANDOM_MINUS1_1(),
                                                      (VisibleRect::center().y - radius) * AXRANDOM_MINUS1_1());
