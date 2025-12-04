@@ -601,15 +601,14 @@ void DrawNode::drawRoundedRect(const Vec2& origin,
     // Center points of the 4 arcs
     Vec2 centers[4] = {rect[0], rect[1], rect[2], rect[3]};
 
-
     // Draw filled rounded rect
     drawSolidRect(origin + Vec2(radius, 0), origin + Vec2(destination.width - radius, destination.height), fillColor);
     drawSolidRect(origin + Vec2(0, radius), origin + Vec2(destination.width, destination.height - radius), fillColor);
 
     for (int i = 0; i < 4; i++)
     {
-    //    drawSolidCircle(centers[i], radius, 0, segments + radius, fillColor);
-        _drawPoint(centers[i], radius,  fillColor,PointType::Circle);
+       //   drawSolidCircle(centers[i], radius, 0, segments, fillColor);
+        _drawPoint(centers[i], radius, fillColor, PointType::Circle);
     }
 
     // Optional: outline
@@ -1346,15 +1345,15 @@ void DrawNode::_drawCircle(const Vec2& center,
 // transform is not supported (for speed)
 void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, float angle)
 {
-    Vec2 n = {-1, 0};
+    Vec2 vec2 = {-1, 0};
     if (angle != 0.0f)
     {
         float aa    = AX_DEGREES_TO_RADIANS(angle);
         Vec2 _angle = {cosf(aa), sinf(aa)};
-        n           = {_angle.x, _angle.y};
+        vec2        = {_angle.x, _angle.y};
     }
 
-    _drawSolidCircle(center, radius, fillColor, n);
+    _drawSolidCircle(center, radius, fillColor, vec2);
 }
 
 void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor)
@@ -1362,15 +1361,15 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
     auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 6));
     _trianglesDirty = true;
 
-    V2F_C4B_T2F a      = {Vec2(center.x - radius, center.y - radius), fillColor, Vec2(-1.0f, -1.0f)};
-    V2F_C4B_T2F b      = {Vec2(center.x - radius, center.y + radius), fillColor, Vec2(-1.0f, 1.0f)};  // TOP_LEFT
-    V2F_C4B_T2F c      = {Vec2(center.x + radius, center.y + radius), fillColor, Vec2(1.0f, 1.0f)};
-    V2F_C4B_T2F d      = {Vec2(center.x + radius, center.y - radius), fillColor, Vec2(1.0f, -1.0f)};
-    triangles[0]       = {a, b, c};
-    triangles[1]       = {a, c, d};
+    V2F_C4B_T2F a = {Vec2(center.x - radius, center.y - radius), fillColor, Vec2(-1.0f, -1.0f)};
+    V2F_C4B_T2F b = {Vec2(center.x - radius, center.y + radius), fillColor, Vec2(-1.0f, 1.0f)};  // TOP_LEFT
+    V2F_C4B_T2F c = {Vec2(center.x + radius, center.y + radius), fillColor, Vec2(1.0f, 1.0f)};
+    V2F_C4B_T2F d = {Vec2(center.x + radius, center.y - radius), fillColor, Vec2(1.0f, -1.0f)};
+    triangles[0]  = {a, b, c};
+    triangles[1]  = {a, c, d};
 }
 
-void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 angle)
+void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F& fillColor, Vec2 vec2)
 {
     Color4F fillColor1 = fillColor + Color4F(0.51f, 0.5f, 0.5f, 0.0f);
     if (0)
@@ -1389,7 +1388,7 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
         _linesDirty  = true;
 
         line[0] = {center, fillColor1, Vec2::ZERO};
-        line[1] = {center + angle * radius, fillColor1, Vec2::ZERO};
+        line[1] = {center + vec2 * radius, fillColor1, Vec2::ZERO};
     }
     else
     {
@@ -1405,7 +1404,7 @@ void DrawNode::_drawSolidCircle(const Vec2& center, float radius, const Color4F&
         triangles[1] = {a, c, d};
 
         V2F_C4B_T2F e = {center - Vec2(1, 1), fillColor1, Vec2::ZERO};
-        V2F_C4B_T2F f = {center + angle * radius, fillColor1, Vec2::ZERO};
+        V2F_C4B_T2F f = {center + vec2 * radius, fillColor1, Vec2::ZERO};
         V2F_C4B_T2F g = {center + Vec2(1, 1), fillColor1, Vec2::ZERO};
         triangles[2]  = {g, f, e};
     }
@@ -1514,7 +1513,7 @@ void DrawNode::_drawPoint(const Vec2& position,
 {
     // default circle (static for speed)
     static Vec2 t2f[4] = {{-1.0f, -1.0f}, {-1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, -1.0f}};
-    float radius       = pointSize / 2;
+    float radius       = pointSize;
 
     switch (pointType)
     {
@@ -1544,7 +1543,7 @@ void DrawNode::_drawPoint(const Vec2& position,
     //  old DrawNode2.0
     // if (pointType == PointType::Circle)
     //{
-    radius = radius * 0.25f;
+    // radius = radius * 0.25f;
     //     //_drawCircle(position, pointSize4, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
 
     //

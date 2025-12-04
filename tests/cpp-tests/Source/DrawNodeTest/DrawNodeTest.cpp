@@ -3600,7 +3600,7 @@ DrawNodeButtonTest::DrawNodeButtonTest()
 
     // Create the stencil shape (e.g., a circle),
     auto stencil = DrawNode::create();
-    stencil->drawRoundedRect(Vec2(115, 130), Vec2(100, 40), 10, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
+    stencil->drawRoundedRect(Vec2(135, 130), Vec2(100, 40), 20, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
     //    stencil->setPosition(Vec2(240, 160));  // Center of screen
 
     //// Create the content to be clipped "D:\_git\axmol3org\tests\cpp-tests\Content\Images\pattern1.png"
@@ -3617,7 +3617,7 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     layer->addChild(clipper);
 
     auto stencil1 = DrawNode::create();
-    stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
+    stencil1->drawRoundedRect(Vec2(245, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
     auto stencil2 = DrawNode::create();
   //  stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
 
