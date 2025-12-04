@@ -589,9 +589,7 @@ void DrawNode::drawRect(const Vec2& origin, const Vec2& destination, const Color
 void DrawNode::drawRoundedRect(const Vec2& origin,
                                const Vec2& destination,
                                float radius,
-                               const Color4F& fillColor,
-                               const Color4F& borderColor,
-                               float thickness)
+                               const Color4F& color)
 {
     const int segments = 16;  // smoothness of corners
     Vec2 rect[4]       = {origin + Vec2(radius, radius), origin + Vec2(destination.width - radius, radius),
@@ -602,13 +600,13 @@ void DrawNode::drawRoundedRect(const Vec2& origin,
     Vec2 centers[4] = {rect[0], rect[1], rect[2], rect[3]};
 
     // Draw filled rounded rect
-    drawSolidRect(origin + Vec2(radius, 0), origin + Vec2(destination.width - radius, destination.height), fillColor);
-    drawSolidRect(origin + Vec2(0, radius), origin + Vec2(destination.width, destination.height - radius), fillColor);
+    drawRect(origin + Vec2(radius, 0), origin + Vec2(destination.width - radius, destination.height), Color4F::ORANGE);
+    drawRect(origin + Vec2(0, radius), origin + Vec2(destination.width, destination.height - radius), Color4F::MAGENTA);
 
     for (int i = 0; i < 4; i++)
     {
-       //   drawSolidCircle(centers[i], radius, 0, segments, fillColor);
-        _drawPoint(centers[i], radius, fillColor, PointType::Circle);
+        //   drawSolidCircle(centers[i], radius, 0, segments, color);
+        _drawPoint(centers[i], radius, color, PointType::Circle);
     }
 
     // Optional: outline
@@ -1517,22 +1515,25 @@ void DrawNode::_drawPoint(const Vec2& position,
 
     switch (pointType)
     {
-    case PointType::Circle:
+    case DrawNode::PointType::Circle:
     {
-        if (t2f[0] == Vec2::ZERO)
+        if (t2f[0].x == 0)
         {
             t2f[0] = {-1.0f, -1.0f};
             t2f[1] = {-1.0f, 1.0f};
             t2f[2] = {1.0f, 1.0f};
             t2f[3] = {1.0f, -1.0f};
         }
+
+        //radius = pointSize * 0.25f;
+        //_drawCircle(position, pointSize, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
         break;
     }
-    case PointType::Rect:
+    case DrawNode::PointType::Rect:
     {
-        if (t2f[0] != Vec2::ZERO)
+        if (t2f[0].x == -1.0f)
         {
-            t2f[0] = t2f[1] = t2f[2] = t2f[3] = Vec2::ZERO;
+    //        t2f[0] = t2f[1] = t2f[2] = t2f[3] = Vec2::ZERO;
         }
         break;
     }
@@ -1548,8 +1549,15 @@ void DrawNode::_drawPoint(const Vec2& position,
 
     //
 
+
+    //for (int i = 0; i < 4; i++)
+    //{
+    //    AXLOGD("t2f[{}]: {}, {} ", i, t2f[i].x, t2f[i].y);
+    //}
+     
     auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 6));
     _trianglesDirty = true;
+
     V2F_C4B_T2F a   = {Vec2(position.x - radius, position.y - radius), color, t2f[0]};
     V2F_C4B_T2F b   = {Vec2(position.x - radius, position.y + radius), color, t2f[1]};
     V2F_C4B_T2F c   = {Vec2(position.x + radius, position.y + radius), color, t2f[2]};

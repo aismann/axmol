@@ -147,13 +147,10 @@ public:
      * @param color The rectangle color.
      */
     void drawRect(const Vec2& origin, const Vec2& destination, const Color4F& color, float thickness = 1.0f);
-
     void drawRoundedRect(const Vec2& origin,
                          const Vec2& size,
                          float radius,
-                         const Color4F& fillColor,
-                         const Color4F& borderColor,
-                         float thickness = 1.0f);
+                         const Color4F& color);
 
     /** Draws a polygon given a pointer to point coordinates and the number of vertices measured in points.
      * The polygon can be closed or open.
@@ -594,14 +591,14 @@ private:
     void _drawPoint(const Vec2& position,
                     const float pointSize,
                     const Color4F& color,
-                    const DrawNode::PointType pointType);
+                    const DrawNode::PointType pointType = PointType::Circle);
 
     // Internal function _drawPoints
     void _drawPoints(const Vec2* position,
                      unsigned int numberOfPoints,
                      const float pointSize,
                      const Color4F& color,
-                     const DrawNode::PointType pointType);
+                     const DrawNode::PointType pointType = PointType::Circle);
 
     // Internal function _drawDot
     void _drawDot(const Vec2& pos, float radius, const Color4F& color);

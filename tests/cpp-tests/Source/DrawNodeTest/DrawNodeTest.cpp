@@ -3565,11 +3565,11 @@ DrawNodeRoundRectTest::DrawNodeRoundRectTest()
     // drawNode->setAnchorPoint(Vec2(0.5f, 0.5f));
     //  drawNode->drawRect(Vec2(123, 123), Vec2(227, 227), Color(1, 1, 0, 1), 2);
     //  drawNode->drawRect(Vec2(115, 130), Vec2(130, 115), Vec2(115, 100), Vec2(100, 115), Color::MAGENTA, 2);
-    for (int i = 0; i < 10; i++)
+ //   for (int i = 0; i < 10; i++)
     {
-        drawNode->drawRoundedRect(Vec2(115, 130), Vec2(130, 115), 40, Color4F::GREEN, Color4F::GREEN, 2);
-        drawNode->drawRoundedRect(Vec2(10, 50), Vec2(227, 70), 20, Color4F::YELLOW, Color4F::GREEN, 2);
-        drawNode->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY, Color4F::GREEN, 2);
+        drawNode->drawRoundedRect(Vec2(115, 130), Vec2(130, 115), 40, Color4F::GREEN);
+        drawNode->drawRoundedRect(Vec2(10, 50), Vec2(227, 70), 20, Color4F::YELLOW);
+        drawNode->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY);
     }
 }
 
@@ -3600,8 +3600,8 @@ DrawNodeButtonTest::DrawNodeButtonTest()
 
     // Create the stencil shape (e.g., a circle),
     auto stencil = DrawNode::create();
-    stencil->drawRoundedRect(Vec2(135, 130), Vec2(100, 40), 20, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
-    //    stencil->setPosition(Vec2(240, 160));  // Center of screen
+    stencil->drawRoundedRect(Vec2(115, 130), Vec2(100, 40), 20, Color4F(1, 1, 1, 1));
+  //  stencil->setPosition(Vec2(240, 160));  // Center of screen
 
     //// Create the content to be clipped "D:\_git\axmol3org\tests\cpp-tests\Content\Images\pattern1.png"
     // "D:\_git\axmol3org\tests\cpp-tests\Content\hd\Images\MagentaSquare.png"
@@ -3617,9 +3617,10 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     layer->addChild(clipper);
 
     auto stencil1 = DrawNode::create();
-    stencil1->drawRoundedRect(Vec2(245, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1), Color4F(1, 1, 1, 0));
+//   stencil1->drawRoundedRect(Vec2(260, 60), Vec2(140, 60), 30, Color4F(1, 1, 1, 1));
+    stencil1->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY);
     auto stencil2 = DrawNode::create();
-  //  stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1), Color4F(1, 0, 1, 0));
+  //  stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1));
 
     Color4F bright           = Color4F(1, 0, 0, 1);
     Color4F dark             = Color4F(0.2, 0, 0, 1);
@@ -3759,30 +3760,30 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     // clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
     // clipper1->addChild(clipper);
 
-    auto renderTex = RenderTexture::create(256, 256);
+    //auto renderTex = RenderTexture::create(256, 256);
 
-    const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
+    //const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
-    renderTex->beginWithClear(0, 0, 0, 0);
+    //renderTex->beginWithClear(0, 0, 0, 0);
 
-    Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
+    //Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
 
-    Color4F bottomColor(1, 0, 0, 1);  // Red
-    Color4F topColor(0, 0, 1, 1);     // Blue
+    //Color4F bottomColor(1, 0, 0, 1);  // Red
+    //Color4F topColor(0, 0, 1, 1);     // Blue
 
-    Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
+    //Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
 
-    drawNode = DrawNode::create();
-    drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
+    //drawNode = DrawNode::create();
+    //drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
 
-    drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
-    renderTex->end();
+    //drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
+    //renderTex->end();
 
-    // Create a sprite from the texture
-    auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
-    gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
-    gradientSprite->setPosition(Vec2(240, 160));
-    addChild(gradientSprite);
+    //// Create a sprite from the texture
+    //auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
+    //gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
+    //gradientSprite->setPosition(Vec2(240, 160));
+    //addChild(gradientSprite);
 }
 
 std::string DrawNodeButtonTest::title() const
@@ -4074,7 +4075,7 @@ void DrawNodeSpLinesTest::update(float dt)
     for (int i = 0; i < 10; i++)
     {
         array->addControlPoint(Vec2((i % 2) ? 20 : screen.width - 20, 50 + i * 20));
-        drawNode->drawPoint(array->getControlPointAtIndex(i), 10, Color4F::BLUE);
+        drawNode->drawPoint(array->getControlPointAtIndex(i), 5, Color4F::BLUE, DrawNode::PointType::Circle);
     }
     drawNode->drawCardinalSpline(array, 0.1, 20, Color4F::ORANGE);
 
