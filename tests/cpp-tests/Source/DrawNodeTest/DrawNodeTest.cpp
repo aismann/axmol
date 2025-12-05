@@ -3617,8 +3617,8 @@ DrawNodeButtonTest::DrawNodeButtonTest()
     layer->addChild(clipper);
 
     auto stencil1 = DrawNode::create();
-//   stencil1->drawRoundedRect(Vec2(260, 60), Vec2(140, 60), 30, Color4F(1, 1, 1, 1));
-    stencil1->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY);
+    stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1));
+
     auto stencil2 = DrawNode::create();
   //  stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1));
 

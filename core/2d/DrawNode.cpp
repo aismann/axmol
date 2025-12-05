@@ -1525,15 +1525,15 @@ void DrawNode::_drawPoint(const Vec2& position,
             t2f[3] = {1.0f, -1.0f};
         }
 
-        //radius = pointSize * 0.25f;
-        //_drawCircle(position, pointSize, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
+        radius = pointSize * 0.25f;
+ //       _drawCircle(position, pointSize, 0, 16, false, 1.0f, 1.0f, Color4F(), color, true);
         break;
     }
     case DrawNode::PointType::Rect:
     {
         if (t2f[0].x == -1.0f)
         {
-    //        t2f[0] = t2f[1] = t2f[2] = t2f[3] = Vec2::ZERO;
+            t2f[0] = t2f[1] = t2f[2] = t2f[3] = Vec2::ZERO;
         }
         break;
     }
@@ -1554,7 +1554,7 @@ void DrawNode::_drawPoint(const Vec2& position,
     //{
     //    AXLOGD("t2f[{}]: {}, {} ", i, t2f[i].x, t2f[i].y);
     //}
-     
+
     auto triangles  = reinterpret_cast<V2F_C4B_T2F_Triangle*>(expandBufferAndGetPointer(_triangles, 6));
     _trianglesDirty = true;
 
