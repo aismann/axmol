@@ -27,12 +27,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 
-#include "2d/AutoPolygon.h"
 #include "poly2tri/poly2tri.h"
+#include "2d/AutoPolygon.h"
 #include "base/Director.h"
 #include "base/axstd.h"
 #include "renderer/TextureCache.h"
 #include "clipper2/clipper.h"
+#include "clipper2/clipper.triangulation.h"
 #include <algorithm>
 #include <math.h>
 
@@ -171,8 +172,8 @@ float PolygonInfo::getArea() const
     return area;
 }
 
-AutoPolygon::AutoPolygon(std::string_view filename)
-    : _image(nullptr), _data(nullptr), _filename(""), _width(0), _height(0), _scaleFactor(0)
+AutoPolygon::AutoPolygon(std::string_view filename, ax::Scene* scene)
+    : _scene(scene), _image(nullptr), _data(nullptr), _filename(""), _width(0), _height(0), _scaleFactor(0)
 {
     _filename = filename;
     _image    = new Image();
@@ -403,7 +404,8 @@ std::vector<ax::Vec2> AutoPolygon::marchSquare(const Rect& rect, const Vec2& sta
         }
         else
         {
-            _points.emplace_back(Vec2((float)(curx - rect.origin.x) / _scaleFactor, (float)(rect.size.height - cury + rect.origin.y) / _scaleFactor));
+            _points.emplace_back(Vec2((float)(curx - rect.origin.x) / _scaleFactor,
+                                      (float)(rect.size.height - cury + rect.origin.y) / _scaleFactor));
         }
 
         count++;
@@ -485,7 +487,7 @@ std::vector<Vec2> AutoPolygon::reduce(const std::vector<Vec2>& points, const Rec
     if (size < 3)
     {
         AXLOGE("AUTOPOLYGON: cannot reduce points for {} that has less than 3 points in input, e: {}", _filename,
-            epsilon);
+               epsilon);
         return std::vector<Vec2>();
     }
     // if there are less than 9 points (but more than 3), then we don't need to reduce it
@@ -519,7 +521,7 @@ std::vector<Vec2> AutoPolygon::expand(const std::vector<Vec2>& points, const ax:
     Clipper2Lib::Path64 result;
     Clipper2Lib::Paths64 solution;
 
-    for (auto&& pt:points)
+    for (auto&& pt : points)
     {
         result.emplace_back(Clipper2Lib::Point64(pt.x * PRECISION, pt.y * PRECISION));
     }
@@ -527,7 +529,6 @@ std::vector<Vec2> AutoPolygon::expand(const std::vector<Vec2>& points, const ax:
     Clipper2Lib::ClipperOffset co;
     co.AddPath(result, Clipper2Lib::JoinType::Miter, Clipper2Lib::EndType::Polygon);
     co.Execute(epsilon * PRECISION, solution);
-
 
     // turn the result into simply polygon (AKA, fix overlap)
     // clamp into the specified rect
@@ -549,10 +550,10 @@ std::vector<Vec2> AutoPolygon::expand(const std::vector<Vec2>& points, const ax:
     cl.Execute(Clipper2Lib::ClipType::Intersection, Clipper2Lib::FillRule::NonZero, out);
 
     /*
-    * Notes: the clipper2 no longer remove duplicates, so we ensure it with std::set to avoid crash some times
-    *   Fix issue: https://github.com/axmolengine/axmol/issues/1075
-    *   @remark: Still faster than clipper1
-    */
+     * Notes: the clipper2 no longer remove duplicates, so we ensure it with std::set to avoid crash some times
+     *   Fix issue: https://github.com/axmolengine/axmol/issues/1075
+     *   @remark: Still faster than clipper1
+     */
     using Point64Ptr = const Clipper2Lib::Point64*;
     struct point64_less
     {
@@ -564,23 +565,132 @@ std::vector<Vec2> AutoPolygon::expand(const std::vector<Vec2>& points, const ax:
 
     std::set<Point64Ptr, point64_less> pointSets;
 
+    Clipper2Lib::PathsD subTri, solTri;
+    //  enum class TriangulateResult
+    //{
+    //    success,
+    //    fail,
+    //    no_polygons,
+    //    paths_intersect
+    //};
+
+    //// Triangulate - this function will not accept intesecting paths
+    // TriangulateResult Triangulate(const Paths64& pp, Paths64& solution, bool useDelaunay = true);
+    // TriangulateResult Triangulate(const PathsD& pp, int decPlaces, PathsD& solution, bool useDelaunay = true);
+
     std::vector<Vec2> outPoints;
+    Clipper2Lib::PathD path64;
+
     for (auto&& p2 : out)
     {
-        if (!p2->IsHole())
+        //     if (!p2->IsHole())
         {
-            outPoints.reserve(outPoints.size() + p2->Polygon().size());
+            //      outPoints.reserve(outPoints.size() + p2->Polygon().size());
+           // path64.reserve(path64.size() + p2->Polygon().size());
             for (auto&& so : p2->Polygon())
             {
-                if (pointSets.emplace(&so).second)
+                //     if (pointSets.emplace(&so).second)
+                {
+                    AXLOGD("              outPoints: {}, {}", so.x / PRECISION, so.y / PRECISION);
                     outPoints.emplace_back(so.x / PRECISION, so.y / PRECISION);
+                    path64.push_back({so.x / PRECISION, so.y / PRECISION});
+                   // path64.emplace_back(so.x, so.y);
+                }
             }
         }
-        else
-        {
-            AXLOGW("Clipper2 detect a hole!");
-        }
+        // else
+        //{
+        //     AXLOGW("Clipper2 detect a hole!");
+        // }
+        subTri.push_back(path64);
     }
+
+    auto draw = ax::DrawNode::create();
+    _scene->addChild(draw, 100);
+
+    // path64.clear();
+    // subTri.clear();
+    // path64.emplace_back(50, 50);
+    // path64.emplace_back(200, 50);
+    // path64.emplace_back(200, 200);
+    // subTri.emplace_back(path64);
+
+    // outPoints.clear();
+    // outPoints.emplace_back(200, 200);
+    // outPoints.emplace_back(200, 50);
+    // outPoints.emplace_back(50, 50);
+
+      // invert the above path so the man appears the right way up (in Windows).
+    //for (Clipper2Lib::PointD& p : subTri[0])
+    //{
+    //    p.y = -p.y;
+    //}
+    // we must now reverse the path because outer paths must always be clockwise (& inner paths CCW).
+    std::reverse(subTri[0].begin(), subTri[0].end());
+
+
+
+    auto tr = Clipper2Lib::Triangulate(subTri, 0, solTri, true);
+   // outPoints.reserve(solTri.size());
+    for (auto&& p : solTri)
+    {
+        AXLOGD("Clipper2Lib::Triangulat: {}, {}", p.data()->x, p.data()->y);
+        //   outPoints.emplace_back(p.data()->x, p.data()->y);
+    }
+
+    int i = 0;
+    draw->setPosition({270, 100});
+   
+
+    for (ssize_t i = 0; i <solTri.size(); i++)
+    {
+        draw->drawDot(Vec2(solTri.at(i).data()->x, solTri.at(i).data()->y), 2, Color4F::BLUE);
+      //  draw->drawDot(Vec2(solTri.at(i).data()->x / PRECISION, solTri.at(i).data()->y / PRECISION), 2, Color4F::BLUE);
+        // draw->drawDot(Vec2(solTri.at(i + 1).data()->x, solTri.at(i + 1).data()->y), 2, Color4F::GREEN);
+        // draw->drawDot(Vec2(solTri.at(i + 2).data()->x, solTri.at(i + 2).data()->y), 2, Color4F::RED);
+
+        // draw->drawLine(Vec2(solTri.at(i + 0).data()->x, solTri.at(i + 0).data()->y),
+        //                Vec2(solTri.at(i + 1).data()->x, solTri.at(i + 1).data()->y), Color4F::BLUE);
+        // draw->drawLine(Vec2(solTri.at(i + 1).data()->x, solTri.at(i + 1).data()->y),
+        //                Vec2(solTri.at(i + 2).data()->x, solTri.at(i + 2).data()->y), Color4F::GREEN);
+        // draw->drawLine(Vec2(solTri.at(i + 2).data()->x, solTri.at(i + 2).data()->y),
+        //                Vec2(solTri.at(i + 0).data()->x, solTri.at(i + 0).data()->y), Color4F::RED);
+
+        //     i = i + 3;
+        // const auto count   = polygoninfo.triangles.indexCount / 3;
+        // const auto indices = polygoninfo.triangles.indices;
+        // const auto verts   = polygoninfo.triangles.verts;
+        // for (ssize_t i = 0; i < count; i++)
+        //{
+        //     // draw 3 lines
+        //     Vec3 from = verts[indices[i * 3]].vertices;
+        //     Vec3 to   = verts[indices[i * 3 + 1]].vertices;
+        //     drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::BLUE);
+        //     AXLOGD("updateDrawNode: {}, {}", from.x, from.y);
+        //     from = verts[indices[i * 3 + 1]].vertices;
+        //     to   = verts[indices[i * 3 + 2]].vertices;
+        //     drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::GREEN);
+        //     AXLOGD("updateDrawNode: {}, {}", from.x, from.y);
+        //     from = verts[indices[i * 3 + 2]].vertices;
+        //     to   = verts[indices[i * 3]].vertices;
+        //     drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::RED);
+        //     AXLOGD("updateDrawNode: {}, {}", from.x, from.y);
+        // }
+    }
+    solTri.clear();
+    tr = Clipper2Lib::Triangulate(subTri, 3, solTri, false);
+
+    for (unsigned int i = 0; i <solTri.size(); i++)
+    {
+      //  draw->drawDot(Vec2(solTri.at(i).data()->x / PRECISION, solTri.at(i).data()->y / PRECISION), 1, Color4F::RED);
+        draw->drawDot(Vec2(solTri.at(i).data()->x, solTri.at(i).data()->y), 1, Color4F::RED);
+    }
+
+    // for (auto&& p : solTri)
+    //{
+    //     AXLOGD("Clipper2Lib::Triangulat: {}, {}", p.data()->x, p.data()->y);
+    //     //   outPoints.emplace_back(p.data()->x, p.data()->y);
+    // }
 
     return outPoints;
 }
@@ -593,7 +703,6 @@ TrianglesCommand::Triangles AutoPolygon::triangulate(const std::vector<Vec2>& po
         AXLOGE("AUTOPOLYGON: cannot triangulate {} with less than 3 points", _filename);
         return TrianglesCommand::Triangles();
     }
-
 
     std::vector<p2t::Point> p2pointsStorage;
     p2pointsStorage.reserve(points.size());
@@ -641,10 +750,11 @@ TrianglesCommand::Triangles AutoPolygon::triangulate(const std::vector<Vec2>& po
             else
             {
                 // vert does not exist yet, so we need to create a new one,
-                auto c4b         = Color4B::WHITE;
-                auto t2f         = Tex2F(0, 0);  // don't worry about tex coords now, we calculate that later
+                auto c4b = Color4B::WHITE;
+                auto t2f = Tex2F(0, 0);  // don't worry about tex coords now, we calculate that later
                 verts.push_back(V3F_C4B_T2F{v3, c4b, t2f});
-                indices[idx++] = vdx++;;
+                indices[idx++] = vdx++;
+                ;
             }
         }
     }
@@ -714,7 +824,14 @@ PolygonInfo AutoPolygon::generateTriangles(const Rect& rect, float epsilon, floa
     auto p        = trace(realRect, threshold);
     p             = reduce(p, realRect, epsilon);
     p             = expand(p, realRect, epsilon);
-    auto tri      = triangulate(p);
+
+    // TrianglesCommand::Triangles tri(p, p.size(), p.size());
+    ////    Triangles(V3F_C4B_T2F * _verts, unsigned short* _indices, unsigned int _vertCount,
+    ////                   unsigned int _indexCount)
+    ////    : verts(_verts), indices(_indices), vertCount(_vertCount), indexCount(_indexCount)
+    ////{}
+
+    auto tri = triangulate(p);
     calculateUV(realRect, tri.verts, tri.vertCount);
     PolygonInfo ret;
     ret.triangles = tri;
@@ -723,10 +840,14 @@ PolygonInfo AutoPolygon::generateTriangles(const Rect& rect, float epsilon, floa
     return ret;
 }
 
-PolygonInfo AutoPolygon::generatePolygon(std::string_view filename, const Rect& rect, float epsilon, float threshold)
+PolygonInfo AutoPolygon::generatePolygon(std::string_view filename,
+                                         ax::Scene* scene,
+                                         const Rect& rect,
+                                         float epsilon,
+                                         float threshold)
 {
-    AutoPolygon ap(filename);
+    AutoPolygon ap(filename, scene);
     return ap.generateTriangles(rect, epsilon, threshold);
 }
 
-}
+}  // namespace ax

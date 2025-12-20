@@ -115,31 +115,37 @@ void SpritePolygonTestCase::updateDrawNode()
 {
     if (_isDebugDraw && _drawNodes.size() > 0)
     {
+
         for (int i = 0; i < _drawNodes.size(); i++)
         {
+
             auto drawnode = _drawNodes.at(i);
             auto sp       = (Sprite*)drawnode->getParent();
             if (!sp)
                 return;
             const auto& polygoninfo = sp->getPolygonInfo();
             drawnode->clear();
-            const auto count   = polygoninfo.triangles.indexCount / 3;
+            const auto count   = polygoninfo.triangles.indexCount;// / 3;
             const auto indices = polygoninfo.triangles.indices;
             const auto verts   = polygoninfo.triangles.verts;
             for (ssize_t i = 0; i < count; i++)
             {
-                // draw 3 lines
-                Vec3 from = verts[indices[i * 3]].vertices;
-                Vec3 to   = verts[indices[i * 3 + 1]].vertices;
-                drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::BLUE);
+                Vec3 from = verts[indices[i]].vertices;
+                drawnode->drawDot(Vec2(from.x, from.y), 3, Color4F::GREEN);
 
-                from = verts[indices[i * 3 + 1]].vertices;
-                to   = verts[indices[i * 3 + 2]].vertices;
-                drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::GREEN);
-
-                from = verts[indices[i * 3 + 2]].vertices;
-                to   = verts[indices[i * 3]].vertices;
-                drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::RED);
+                //// draw 3 lines
+                //Vec3 from = verts[indices[i * 3]].vertices;
+                //Vec3 to   = verts[indices[i * 3 + 1]].vertices;
+                //drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::BLUE);
+                //AXLOGD("updateDrawNode: {}, {}", from.x, from.y);
+                //from = verts[indices[i * 3 + 1]].vertices;
+                //to   = verts[indices[i * 3 + 2]].vertices;
+                //drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::GREEN);
+                //AXLOGD("updateDrawNode: {}, {}", from.x, from.y);
+                //from = verts[indices[i * 3 + 2]].vertices;
+                //to   = verts[indices[i * 3]].vertices;
+                //drawnode->drawLine(Vec2(from.x, from.y), Vec2(to.x, to.y), Color4F::RED);
+                //AXLOGD("updateDrawNode: {}, {}", from.x, from.y);
             }
         }
     }
@@ -188,10 +194,10 @@ void SpritePolygonTest1::initSprites()
     auto filename = s_pathGrossini;
 
     // Sprite
-    auto pinfo     = AutoPolygon::generatePolygon(filename);
+    auto pinfo     = AutoPolygon::generatePolygon(filename, this);
     _polygonSprite = Sprite::create(pinfo);
     _polygonSprite->setTag(101);
-    addChild(_polygonSprite);
+     addChild(_polygonSprite);
     _polygonSprite->setPosition(Vec2(s) / 2 + offset);
 
     _normalSprite = Sprite::create(filename);
@@ -246,7 +252,7 @@ void SpritePolygonTest2::initSprites()
     Rect head = Rect(30 * a, 25 * a, 25 * a, 25 * a);
  
     // Sprite
-    auto pinfo     = AutoPolygon::generatePolygon(filename, head);
+    auto pinfo     = AutoPolygon::generatePolygon(filename, this, head);
     _polygonSprite = Sprite::create(pinfo);
     _polygonSprite->setTag(101);
     addChild(_polygonSprite);
@@ -340,7 +346,7 @@ void SpritePolygonTestSlider::changeEpsilon(ax::Object* pSender, ax::ui::Slider:
             {
                 Sprite* sp = (Sprite*)child;
                 auto file  = sp->getName();
-                auto pinfo = AutoPolygon::generatePolygon(file, Rect::ZERO, epsilon);
+                auto pinfo = AutoPolygon::generatePolygon(file, this, Rect::ZERO, epsilon);
                 sp->setPolygonInfo(pinfo);
                 updateLabel(sp, pinfo);
             }
@@ -364,7 +370,7 @@ Sprite* SpritePolygonTestSlider::makeSprite(std::string_view filename, const Vec
     // Sprite
     auto quadSize    = Sprite::create(filename)->getContentSize();
     int originalSize = quadSize.width * quadSize.height;
-    auto pinfo       = AutoPolygon::generatePolygon(filename);
+    auto pinfo       = AutoPolygon::generatePolygon(filename, this);
     auto ret         = Sprite::create(pinfo);
     ret->setName(filename);
     ret->setTag(_tagIndex);
@@ -434,7 +440,7 @@ bool SpritePolygonTest5::init()
 {
     if (SpritePolygonTestCase::init())
     {
-        _polygonInfo = AutoPolygon::generatePolygon(s_pathGrossini);
+        _polygonInfo = AutoPolygon::generatePolygon(s_pathGrossini, this);
         loadDefaultSprites();
         initTouch();
         scheduleUpdate();
@@ -638,7 +644,7 @@ void SpritePolygonPerformance::incrementStats()
 
 void SpritePolygonPerformanceTestDynamic::initIncrementStats()
 {
-    _pinfo   = AutoPolygon::generatePolygon(s_pathGrossini);
+    _pinfo   = AutoPolygon::generatePolygon(s_pathGrossini, this);
     _incVert = _pinfo.getVertCount();
     _incTri  = _pinfo.getTrianglesCount();
     _incPix  = _pinfo.getArea();
@@ -690,7 +696,7 @@ SpritePolygonTestNoCrash::SpritePolygonTestNoCrash()
 void SpritePolygonTestNoCrash::initSprites()
 {
     auto s      = Director::getInstance()->getWinSize();
-    auto pinfo  = AutoPolygon::generatePolygon("Images/sprite_polygon_crash.png", Rect::ZERO, 0.5);
+    auto pinfo  = AutoPolygon::generatePolygon("Images/sprite_polygon_crash.png", this, Rect::ZERO, 0.5);
     auto sprite = Sprite::create(pinfo);
     addChild(sprite);
     sprite->setPosition(s.width / 2, s.height / 2);
@@ -747,7 +753,7 @@ void SpritePolygonTestAutoPolyIsland::initSprites()
 {
     auto s = Director::getInstance()->getWinSize();
 
-    auto pinfo  = AutoPolygon::generatePolygon("Images/island_polygon.png", Rect::ZERO, 1);
+    auto pinfo  = AutoPolygon::generatePolygon("Images/island_polygon.png", this, Rect::ZERO, 1);
     auto sprite = Sprite::create(pinfo);
     addChild(sprite);
     sprite->setPosition(s.width / 2, s.height / 2);
@@ -834,13 +840,13 @@ void Issue14017Test::initSprites()
     auto filename_fix = "Images/bug14017_fix.png";
 
     // Sprite
-    auto pinfo     = AutoPolygon::generatePolygon(filename);
+    auto pinfo     = AutoPolygon::generatePolygon(filename, this);
     _polygonSprite = Sprite::create(pinfo);
     _polygonSprite->setTag(101);
     addChild(_polygonSprite);
     _polygonSprite->setPosition(Vec2(s) / 2);
 
-    auto pinfo_fix = AutoPolygon::generatePolygon(filename_fix);
+    auto pinfo_fix = AutoPolygon::generatePolygon(filename_fix, this);
     _polygonSprite_fix = Sprite::create(pinfo_fix);
     _polygonSprite_fix->setTag(102);
     addChild(_polygonSprite_fix);
@@ -917,7 +923,7 @@ void SpritePolygonTestPerformance::createSprite()
 
     if (pinfo.getFilename() == "")
     {
-        pinfo = AutoPolygon::generatePolygon("Images/grossini_dance_01.png");
+        pinfo = AutoPolygon::generatePolygon("Images/grossini_dance_01.png", this);
     }
 
     // AutoPolygonSprite

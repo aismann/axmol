@@ -149,7 +149,7 @@ public:
      * @param   filename    a path to image file, e.g., "scene1/monster.png".
      * @return  an AutoPolygon object;
      */
-    AutoPolygon(std::string_view filename);
+    AutoPolygon(std::string_view filename, ax::Scene* scene);
 
     /**
      * Destructor of AutoPolygon.
@@ -257,6 +257,7 @@ public:
      * @endcode
      */
     static PolygonInfo generatePolygon(std::string_view filename,
+                                       ax::Scene* scene,
                                        const Rect& rect = Rect::ZERO,
                                        float epsilon = 2.0f,
                                        float threshold = 0.05f);
@@ -288,6 +289,7 @@ protected:
     unsigned int _height;
     float _scaleFactor;
     unsigned int _threshold;
+    ax::Scene* _scene;
 };
 
 }

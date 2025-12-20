@@ -27,8 +27,6 @@ THE SOFTWARE.
 #include "renderer/Renderer.h"
 #include "renderer/CustomCommand.h"
 
-#include <chrono>
-
 #if defined(_WIN32)
 #    pragma push_macro("TRANSPARENT")
 #    undef TRANSPARENT
@@ -1410,12 +1408,8 @@ DrawNodeTests::DrawNodeTests()
     ADD_TEST_CASE(DrawNodeSpLinesOpenClosedTest);
     ADD_TEST_CASE(DrawNodeAxmolTest2);
 
-    ADD_TEST_CASE(DrawNodeRoundRectTest);
-    ADD_TEST_CASE(DrawNodeButtonTest);
-
 #if defined(AX_PLATFORM_PC)
     ADD_TEST_CASE(CandyMixEeffect);
-    ADD_TEST_CASE(DrawNodePointTest);
 #endif
     ADD_TEST_CASE(DrawNodePictureTest);
     ADD_TEST_CASE(DrawNodeJellyFishTest);
@@ -1430,6 +1424,7 @@ DrawNodeTests::DrawNodeTests()
     ADD_TEST_CASE(DrawNodeLineDrawTest);
     ADD_TEST_CASE(DrawNodeMethodsTest);
     ADD_TEST_CASE(DrawNodePlayground);
+
 }
 
 DrawNodeBaseTest::DrawNodeBaseTest()
@@ -3528,24 +3523,20 @@ DrawNodePolygonTest::DrawNodePolygonTest()
     addChild(drawNode);
     drawNode->properties.setTransform(true);
     drawNode->setScale(0.3f);
-    drawNode->properties.setPosition(Vec2(150, 590));
-    drawNode->properties.setScale({0.4f, 0.4f});
-    drawNode->drawSolidPolygon(horse, sizeof(horse) / sizeof(horse[0]), Color4F::WHITE, 0.0f, Color4F::RED);
-    drawNode->properties.setPosition(Vec2(30, 200));
-    drawNode->properties.setScale({1.0f, 1.0f});
+    drawNode->properties.setPosition(Vec2(50, 220));
     drawNode->drawPoly(horse, sizeof(horse) / sizeof(horse[0]), true, Color4F::GREEN);
     drawNode->properties.setPosition(Vec2(700, 220));
     drawNode->properties.setScale({0.1f, 0.1f});
-    drawNode->drawSolidPolygon(spider, sizeof(spider) / sizeof(spider[0]), Color4F::YELLOW, 2.0f, Color4F::RED);
+    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
     drawNode->properties.setScale({0.2f, 0.2f});
     drawNode->properties.setPosition(Vec2(880, 200));
     drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
     drawNode->properties.setScale({0.4f, 0.4f});
     drawNode->properties.setPosition(Vec2(1100, 160));
-    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED, true);
+    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
     drawNode->properties.setScale({0.7f, 0.7f});
     drawNode->properties.setPosition(Vec2(950, 400));
-    drawNode->drawSolidPolygon(spider, sizeof(spider) / sizeof(spider[0]), Color4F::YELLOW, 5.0f, Color4F::RED);
+    drawNode->drawPoly(spider, sizeof(spider) / sizeof(spider[0]), true, Color4F::RED);
 }
 
 std::string DrawNodePolygonTest::title() const
@@ -3554,244 +3545,6 @@ std::string DrawNodePolygonTest::title() const
 }
 
 std::string DrawNodePolygonTest::subtitle() const
-{
-    return "";
-}
-
-DrawNodeRoundRectTest::DrawNodeRoundRectTest()
-{
-    // drawNode = DrawNode::create();
-    // addChild(drawNode);
-    // drawNode->setAnchorPoint(Vec2(0.5f, 0.5f));
-    //  drawNode->drawRect(Vec2(123, 123), Vec2(227, 227), Color(1, 1, 0, 1), 2);
-    //  drawNode->drawRect(Vec2(115, 130), Vec2(130, 115), Vec2(115, 100), Vec2(100, 115), Color::MAGENTA, 2);
- //   for (int i = 0; i < 10; i++)
-    {
-        drawNode->drawRoundedRect(Vec2(115, 130), Vec2(130, 115), 40, Color4F::GREEN);
-        drawNode->drawRoundedRect(Vec2(10, 50), Vec2(227, 70), 20, Color4F::YELLOW);
-        drawNode->drawRoundedRect(Vec2(300, 50), Vec2(100, 60), 5, Color4F::GRAY);
-    }
-}
-
-std::string DrawNodeRoundRectTest::title() const
-{
-    return "drawRoundRect Test";
-}
-
-std::string DrawNodeRoundRectTest::subtitle() const
-{
-    return "";
-}
-
-DrawNodeButtonTest::DrawNodeButtonTest()
-{
-    static int buttonStatus[3];
-
-    auto layer = Layer::create();
-    addChild(layer);
-
-    //// Make a reference grid so distortion is visible
-    // auto draw = DrawNode::create();
-    // for (int x = -300; x <= 300; x += 30)
-    //     draw->drawLine(Vec2(x, -300), Vec2(x, 300), Color4F(0.2f, 0.2f, 0.2f, 1));
-    // for (int y = -300; y <= 300; y += 30)
-    //     draw->drawLine(Vec2(-300, y), Vec2(300, y), Color4F(0.2f, 0.2f, 0.2f, 1));
-    // addChild(draw);
-
-    // Create the stencil shape (e.g., a circle),
-    auto stencil = DrawNode::create();
-    stencil->drawRoundedRect(Vec2(115, 130), Vec2(100, 40), 20, Color4F(1, 1, 1, 1));
-  //  stencil->setPosition(Vec2(240, 160));  // Center of screen
-
-    //// Create the content to be clipped "D:\_git\axmol3org\tests\cpp-tests\Content\Images\pattern1.png"
-    // "D:\_git\axmol3org\tests\cpp-tests\Content\hd\Images\MagentaSquare.png"
-    auto sprite = Sprite::create("hd/Images/MagentaSquare.png");
-    sprite->setPosition(Vec2(115, 130));
-    sprite->setScaleX(2.5);
-    // Create the clipping node
-    auto clipper = ClippingNode::create();
-    clipper->setStencil(stencil);
-    clipper->setInverted(false);        // Set to true to invert the mask
-    clipper->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-    clipper->addChild(sprite);
-    layer->addChild(clipper);
-
-    auto stencil1 = DrawNode::create();
-    stencil1->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 1, 1, 1));
-
-    auto stencil2 = DrawNode::create();
-  //  stencil2->drawRoundedRect(Vec2(215, 60), Vec2(200, 60), 30, Color4F(1, 0, 1, 1));
-
-    Color4F bright           = Color4F(1, 0, 0, 1);
-    Color4F dark             = Color4F(0.2, 0, 0, 1);
-    static Color4F color3[]  = {bright, bright, dark};
-    static Color4F color31[] = {dark, dark, bright};
-
-    Vec2 triangle[]  = {{215, 120}, {415, 120}, {215, 60}};
-    Vec2 triangle1[] = {{215, 60}, {415, 60}, {415, 120}};
-
-    stencil2->drawColoredTriangle(triangle, color3);
-    stencil2->drawColoredTriangle(triangle1, color31);
-    // float thick = 2.0f;
-    // for (unsigned int i = 0; i < 100; i++)
-    //{
-    //     float a = (float)i;
-    //     stencil2->drawLine(Vec2(215, 30 + i * thick), Vec2(415, 30 + i * thick), Color4F(1 - (a / 100), 1, 1, 1),
-    //                        thick * 2);
-    // }
-    auto sprite1 = Sprite::create("marble_0017_color_1k.jpg");
-    sprite1->setPosition(Vec2(215, 60));
-    // sprite1->setScaleX(1.5);
-    // sprite1->setScaleY(1.5);
-    //  Create the clipping node
-    auto clipper1 = ClippingNode::create();
-    clipper1->setStencil(stencil1);
-    clipper1->setInverted(false);        // Set to true to invert the mask
-    clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-    clipper1->addChild(stencil2);
-
-    layer->addChild(clipper1);
-
-    auto autoTestLabel = Label::createWithTTF("Button1", "fonts/arial.ttf", 16);
-
-    auto autoTestItem = MenuItemLabel::create(autoTestLabel, [=](Object* sender) {
-        switch (buttonStatus[0])
-        {
-        case 0:
-        {
-
-            auto col = stencil2->getColor();
-            stencil2->setColor(Color3B::BLUE);
-            //   sprite1->setColor(Color3B::BLUE);
-            break;
-        }
-        case 1:
-        {
-            stencil->setScale(1.0);
-            break;
-        }
-        case 2:
-        {
-            break;
-        }
-
-        default:
-            break;
-        }
-
-        // if (buttonStatus[0] == 0)
-        //{
-        //     buttonStatus[0] = 1;;
-        //     showCircles();
-        // }
-        // else
-        //{
-        //     fast = true;
-        //     showCircles();
-        // }
-    });
-
-    autoTestItem->setPosition(Vec2(115, 130) + Vec2(100, 40) / 2);
-
-    auto menu = Menu::create(autoTestItem, nullptr);
-    menu->setPosition(Vec2::ZERO);
-    addChild(menu, 3);
-
-    auto autoTestLabel1 = Label::createWithTTF("Button2", "fonts/arial.ttf", 16, {200, 60}, TextHAlignment::CENTER,
-                                               TextVAlignment::CENTER);
-    auto autoTestItem1  = MenuItemLabel::create(autoTestLabel1, [=](Object* sender) {
-        switch (buttonStatus[0])
-        {
-        case 0:
-        {
-            stencil2->clear();
-            stencil2->drawColoredTriangle(triangle, color31);
-            stencil2->drawColoredTriangle(triangle1, color3);
-
-            scheduleOnce([=](float) {
-                stencil2->clear();
-                stencil2->drawColoredTriangle(triangle, color3);
-                stencil2->drawColoredTriangle(triangle1, color31);
-            }, 0.1, "update_font_size");
-
-            break;
-        }
-        case 1:
-        {
-            break;
-        }
-        case 2:
-        {
-            break;
-        }
-
-        default:
-            break;
-        }
-
-        // if (buttonStatus[0] == 0)
-        //{
-        //     buttonStatus[0] = 1;;
-        //     showCircles();
-        // }
-        // else
-        //{
-        //     fast = true;
-        //     showCircles();
-        // }
-    });
-    //  autoTestItem1->setAnchorPoint({0, 0});
-    autoTestItem1->setPosition(Vec2(215, 60) + Vec2(200, 60) / 2);
-
-    auto menu1 = Menu::create(autoTestItem1, nullptr);
-    menu1->setPosition(Vec2::ZERO);
-
-    // menu1->setContentSize({200, 60});
-    addChild(menu1, 3);
-
-    //
-
-    // auto stencil1 = DrawNode::create();
-    // stencil1->drawSolidCircle(Vec2(0, 0), 10, 0, 36, Color(1, 1, 1, 1));
-    // stencil->setPosition(Vec2(240, 160));  // Center of screen
-    // auto clipper1 = ClippingNode::create();
-    // clipper1->setStencil(stencil1);
-    // clipper1->setInverted(true);        // Set to true to invert the mask
-    // clipper1->setAlphaThreshold(0.05f);  // Pixels with alpha < threshold are discarded
-    // clipper1->addChild(clipper);
-
-    //auto renderTex = RenderTexture::create(256, 256);
-
-    //const auto& proj = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
-
-    //renderTex->beginWithClear(0, 0, 0, 0);
-
-    //Vec2 verts[] = {Vec2(0, 0), Vec2(256, 0), Vec2(256, 256), Vec2(0, 256)};
-
-    //Color4F bottomColor(1, 0, 0, 1);  // Red
-    //Color4F topColor(0, 0, 1, 1);     // Blue
-
-    //Color4F colors[] = {bottomColor, bottomColor, topColor, topColor};
-
-    //drawNode = DrawNode::create();
-    //drawNode->drawPolygon(verts, 4, Color4F::WHITE, 0, Color4F::BLACK, colors);
-
-    //drawNode->visit(Director::getInstance()->getRenderer(), proj.getInversed(), 0);  // Draw into the render texture
-    //renderTex->end();
-
-    //// Create a sprite from the texture
-    //auto gradientSprite = Sprite::createWithTexture(renderTex->getSprite()->getTexture());
-    //gradientSprite->setFlippedY(true);  // Important: RenderTexture is upside-down
-    //gradientSprite->setPosition(Vec2(240, 160));
-    //addChild(gradientSprite);
-}
-
-std::string DrawNodeButtonTest::title() const
-{
-    return "Example: Button";
-}
-
-std::string DrawNodeButtonTest::subtitle() const
 {
     return "";
 }
@@ -3834,69 +3587,14 @@ std::string DrawNodeCircleTest::subtitle() const
 
 DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
 {
-    fast = false;
-
-    showCircles();
-
-    autoTestLabel     = Label::createWithTTF("Slow is on ", "fonts/arial.ttf", 16);
-    auto autoTestItem = MenuItemLabel::create(autoTestLabel, [=](Object* sender) {
-        if (fast)
-        {
-            fast = false;
-            showCircles();
-        }
-        else
-        {
-            fast = true;
-            showCircles();
-        }
-    });
-
-    autoTestItem->setPosition(Vec2(VisibleRect::center().x, VisibleRect::top().y - 100));
-
-    auto menu = Menu::create(autoTestItem, nullptr);
-    menu->setPosition(Vec2::ZERO);
-    addChild(menu, 1);
-}
-void DrawNodeSolidCircleTest::showCircles()
-{
-    static float radius = 20;
-    drawNode->clear();
-
-    Vec2 pos = VisibleRect::center() + Vec2(200, 0);
-    ;
-    Color4F color = Color4F::GRAY;
-
-    auto start = std::chrono::high_resolution_clock::now();
-    // drawNode->setBlendFunc(BlendFunc::DISABLE);
-    for (int i = 0; i < 20000; i++)
+    float radius = 40;
+    for (int i = 0; i < 10000; i++)
     {
-        Vec2 pos      = VisibleRect::center() + Vec2((VisibleRect::center().x - radius) * AXRANDOM_MINUS1_1(),
-                                                     (VisibleRect::center().y - radius) * AXRANDOM_MINUS1_1());
-        Color4F color = Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f);
-        if (fast)
-        {
-            //   drawNode->drawSegment(center),cpVert2Point(cpvadd(center, cpvmult(cpBodyGetRotation(body),
-            //   radius))), 1.0, color);
-            //  drawNode->drawSolidCircle(pos, radius, 0, 36, color);
-            drawNode->drawSolidCircle(pos, radius, color, AXRANDOM_MINUS1_1() * 360);
-        }
-        else
-        {
-            drawNode->drawSolidCircle(pos, radius, color);
-        }
+        Vec2 pos = VisibleRect::center() +
+                   Vec2((VisibleRect::center().x-50) * AXRANDOM_MINUS1_1(), (VisibleRect::center().y -50) * AXRANDOM_MINUS1_1());
+        drawNode->drawSolidCircle(pos, radius, 0, 36,
+                                  Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f));
     }
-    auto end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    if (autoTestLabel)
-    {
-        std::string text = std::to_string(duration.count());
-        text.append(" ms");
-        autoTestLabel->setString(text);
-    }
-
-    rect = {190, 205, 100, 30};
-    drawNode->drawSolidRect(rect, (fast) ? Color4F::GREEN : Color4F::RED);
 }
 
 std::string DrawNodeSolidCircleTest::title() const
@@ -3906,30 +3604,8 @@ std::string DrawNodeSolidCircleTest::title() const
 
 std::string DrawNodeSolidCircleTest::subtitle() const
 {
-    return "20000 Circles (red/green is slow/fast)\nPress the rect below for switch slow/fast";
+    return "10000 Circles";
 }
-
-// DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
-//{
-//     float radius = 40;
-//     for (int i = 0; i < 10000; i++)
-//     {
-//         Vec2 pos = VisibleRect::center() + Vec2((VisibleRect::center().x - 50) * AXRANDOM_MINUS1_1(),
-//                                                 (VisibleRect::center().y - 50) * AXRANDOM_MINUS1_1());
-//         drawNode->drawSolidCircle(pos, radius, 0, 36,
-//                                   Color4F(AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1(), AXRANDOM_0_1() + 0.1f));
-//     }
-// }
-//
-// std::string DrawNodeSolidCircleTest::title() const
-//{
-//     return "SolidCircle Stress Test";
-// }
-//
-// std::string DrawNodeSolidCircleTest::subtitle() const
-//{
-//     return "10000 Circles";
-// }
 
 DrawNodePlayground::DrawNodePlayground()
 {
@@ -4065,9 +3741,6 @@ std::string DrawNodeSpLinesTest::subtitle() const
 
 void DrawNodeSpLinesTest::update(float dt)
 {
-    static int xlabel = 0;
-    static float step = 0;
-
     drawNode->clear();
 
     // Issue #2302
@@ -4075,35 +3748,20 @@ void DrawNodeSpLinesTest::update(float dt)
     for (int i = 0; i < 10; i++)
     {
         array->addControlPoint(Vec2((i % 2) ? 20 : screen.width - 20, 50 + i * 20));
-        drawNode->drawPoint(array->getControlPointAtIndex(i), 5, Color4F::BLUE, DrawNode::PointType::Circle);
+        drawNode->drawPoint(array->getControlPointAtIndex(i), 10, Color4F::BLUE);
     }
     drawNode->drawCardinalSpline(array, 0.1, 20, Color4F::ORANGE);
 
     drawNode->drawCardinalSpline(pts, 0.5f, 360, Color4F::RED, 5.0f);
     drawNode->drawCardinalSpline(pts2, 0.5f, 360, Color4F::GREEN, 2.0f);
 
-    step += dt;
-    if (step > 0.2)
-    {
-        step = 0;
-        xlabel++;
-        if (xlabel > n - 1)
-        {
-            xlabel = 0;
-        }
-    }
-
-    int i1 = xlabel;
-    int i2 = n - 1 - xlabel;
-    drawNode->drawLine(pts->getControlPointAtIndex(i1) - Vec2(0, 30), pts->getControlPointAtIndex(i1) + Vec2(0, 30),
-                       Color4F::YELLOW, 2.0f);
+    int i1 = RandomHelper::random_int(0, n - 1);
+    int i2 = RandomHelper::random_int(0, n - 1);
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 7, Color4F(0, 1, 0, 0.3));
     drawNode->drawDot(pts->getControlPointAtIndex(i1), 4, Color4F::GREEN);
 
-    drawNode->drawLine(pts2->getControlPointAtIndex(i2) - Vec2(0, 30), pts2->getControlPointAtIndex(i2) + Vec2(0, 30),
-                       Color4F::YELLOW, 2.0f);
-    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 7, Color4F(1, 0, 0, 0.3));
-    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 4, Color4F::RED);
+    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 7, Color4F(0, 1, 0, 0.3));
+    drawNode->drawDot(pts2->getControlPointAtIndex(i2), 4, Color4F::GREEN);
 }
 
 DrawNodeSpLinesOpenClosedTest::DrawNodeSpLinesOpenClosedTest()
@@ -4209,52 +3867,6 @@ void DrawNodeSpLinesOpenClosedTest::update(float dt)
 }
 
 #if defined(AX_PLATFORM_PC)
-DrawNodePointTest::DrawNodePointTest()
-{
-    Vec2 visibleSize = Director::getInstance()->getVisibleSize();
-
-    // drawNode->clear();
-    // DrawNodeBaseTest::update(dt);
-
-    //    _subtitle = "please wait";
-    Color4F color = Color4F::RED;
-    int delta     = 10;
-    int xx        = 0;
-    int yy        = 0;
-    for (unsigned int y = 0; y < visibleSize.height; y += delta)
-    {
-        color = Color4F::RED;
-        if (y % 3 == 0)
-        {
-            color = Color4F::BLUE;
-        }
-        for (unsigned int x = 0; x < visibleSize.width; x += delta)
-        {
-            if (x % 4 == 0)
-            {
-                color = Color4F::RED;
-            }
-            Vec2 pos = {(float)x+delta/2, (float)y+delta/2};
-            drawNode->drawPoint(pos, delta-1, color, ax::DrawNode::Circle);
-            xx++;
-        }
-        yy++;
-    }
-    // scheduleUpdate();
-}
-
-std::string DrawNodePointTest::title() const
-{
-    return "Performance: POINT";
-}
-
-std::string DrawNodePointTest::subtitle() const
-{
-    return "";
-}
-
-void DrawNodePointTest::update(float dt) {}
-
 CandyMixEeffect::CandyMixEeffect()
 {
     static const float BUTTON_WIDTH = 30;

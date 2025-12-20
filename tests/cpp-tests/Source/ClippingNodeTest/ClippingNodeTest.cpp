@@ -146,6 +146,7 @@ Action* BasicTest::actionScale()
 
 DrawNode* BasicTest::shape()
 {
+
     auto shape = DrawNode::create();
     static Vec2 triangle[3];
     triangle[0] = Vec2(-100, -100);
@@ -153,14 +154,30 @@ DrawNode* BasicTest::shape()
     triangle[2] = Vec2(0, 100);
 
     static Color4F green(0, 1, 0, 1);
-    shape->drawPolygon(triangle, 3, green, 0, green);
+    // shape->drawPolygon(triangle, 3, green, 0, green);
+
+    if (1) // set 0 if you want see the working drawSolidCircle
+    {
+        // always a retagle (should be a "circle")
+        shape->drawDot(Vec2(50, 50), 40, green);
+    }
+    else //works
+    {
+        shape->drawSolidCircle(Vec2(50, 50), 40, 0, 48, green);
+    }
+    //Control shapes (show the look =>always circles)
+    auto shapeControl = DrawNode::create();
+    shapeControl->drawDot(Vec2(50, 50), 40, green);
+    shapeControl->drawSolidCircle(Vec2(50, 250), 40, 0,48,green);
+    addChild(shapeControl);
+
     return shape;
 }
 
 Sprite* BasicTest::grossini()
 {
     auto grossini = Sprite::create(s_pathGrossini);
-    grossini->setScale(1.5);
+    grossini->setScale(10.5);
     return grossini;
 }
 

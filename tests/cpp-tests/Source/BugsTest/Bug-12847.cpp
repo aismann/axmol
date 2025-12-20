@@ -49,6 +49,7 @@ bool Bug12847Layer::init()
 {
     if (BugsTestBase::init())
     {
+
         Director::getInstance()->setProjection(Director::Projection::_2D);
         auto _visibleSize = Director::getInstance()->getVisibleSize();
 
@@ -78,6 +79,70 @@ bool Bug12847Layer::init()
             sprite4->setPosition(sprite3->getPosition() + Vec2(0.0f, sprite3->getContentSize().height));
             this->addChild(sprite4, 1);
         }
+        auto frameSize = Director::getInstance() -> getGLView()->getFrameSize();
+        float fieldOfView = 1;
+        float aspectRatio = frameSize.width / frameSize.height;
+
+        //// https:  // werplay.medium.com/voronoi-split-screen-a-quick-cocos2d-x-tutorial-12be81fbc98d
+        //auto camera1 = Camera::createPerspective(fieldOfView, aspectRatio, 1, 12000);
+        //camera1->setCameraFlag(CameraFlag::USER5);
+        //auto camera2 = Camera::createPerspective(fieldOfView, aspectRatio, 1, 12000);
+        //camera2->setCameraFlag(CameraFlag::USER5);
+
+        //auto fboSize = Director::getInstance()->getGLView()->getFrameSize();
+        //auto fbo     = ax::SpriteFrame::create()
+        //fbo->create(1, fboSize.width, fboSize.height);
+        //fbo->setClearColor(Color4F(0, 0, 0, 0));
+        //auto rt = new RenderView;
+        //rt->init(fboSize.width, fboSize.height, Texture2D::PixelFormat::RGBA8888);
+        //fbo->attachRenderTarget(rt);
+        //fbo->getRenderTarget()->getTexture()->setAliasTexParameters();
+        //rt->release();
+        //auto rtDS = new DepthStencil;
+        //rtDS->init(fboSize.width, fboSize.height);
+        //fbo->attachDepthStencilTarget(rtDS);
+        //rtDS->release();
+
+        //camera1->setFrameBufferObject(fbo);
+
+        //playerScreen1 = Sprite::create();
+        //playerScreen1->initWithTexture(fbo->getRenderTarget()->getTexture());
+        //this->addChild(playerScreen1);
+        //playerScreen1->setScale(frameSize.width / playerScreen1->getContentSize().width,
+        //                        frameSize.height / playerScreen1->getContentSize().height);
+        //playerScreen1->setTextureRect(Rect(0, 0, fboSize.width / 2, fboSize.height));
+        //playerScreen1->setFlippedY(true);
+        //playerScreen1->setAnchorPoint(Point::ANCHOR_MIDDLE_RIGHT);
+        //playerScreen1->setPosition(winSize.width / 2, winSize.height / 2);
+
+        //playerScreen2->setTextureRect(Rect(fboSize.width / 2, 0, fboSize.width / 2, fboSize.height));
+        //playerScreen2->setAnchorPoint(Point::ANCHOR_MIDDLE_LEFT);
+
+        //const float distanceToSplit = 900;
+        //Point pointToLookAt         = Player2->getPosition().getMidpoint(Player1->getPosition());
+        //float angle                 = Shared::calcAngle(Player::getInstance()->getPosition(), pointToLookAt);
+        //camera1 > setPositionZ(3200);  // whatever Position z you want
+        //camera2 > setPositionZ(3200);
+        //camera->setRotation(angle);
+        //playerScreen1->setRotation(angle);
+        //playerScreen2->setRotation(angle);
+        //if (Player1.distance(pointToLookAt) < distanceToSplit)
+        //{
+        //    // combine screens
+        //    camera1 > setPosition(pointToLookAt);
+        //    camera2 > setPosition(pointToLookAt);
+        //}
+        //else
+        //{
+        //    camera1 > setPosition(pointToLookAt.x + (Player1->getPosition().distance(pointToLookAt) - distanceToSplit) *
+        //                                                cosf(CC_DEGREES_TO_RADIANS(camera1 > getRotation())),
+        //                          pointToLookAt.y + (Player1->getPosition().distance(pointToLookAt) - distanceToSplit) *
+        //                                                -sinf(CC_DEGREES_TO_RADIANS(camera1 > getRotation())));
+        //    camera2->setPosition(pointToLookAt.x + (Player2->getPosition().distance(pointToLookAt) - distanceToSplit) *
+        //                                               -cosf(CC_DEGREES_TO_RADIANS(camera2->getRotation())),
+        //                         pointToLookAt.y + (Player2->getPosition().distance(pointToLookAt) - distanceToSplit) *
+        //                                               sinf(CC_DEGREES_TO_RADIANS(camera2->getRotation())));
+        //}
 
         this->scheduleUpdate();
         return true;
@@ -92,6 +157,9 @@ void Bug12847Layer::update(float dt)
     sprite2->setPositionY(sprite2->getPositionY() + 0.01f);
     sprite3->setPositionY(sprite3->getPositionY() + 0.01f);
     sprite4->setPositionY(sprite4->getPositionY() + 0.01f);
+
+    float distance = sprite1->getPosition().distance(sprite2->getPosition());
+    Point midPoint = sprite1->getPosition().getMidpoint(sprite2->getPosition());
 }
 
 void Bug12847Layer::onEnter()

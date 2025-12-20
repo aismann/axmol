@@ -458,13 +458,6 @@ public:
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
-    void showCircles();
-
-private:
-    bool fast;
-    std::chrono::microseconds duration;
-    ax::Label* autoTestLabel = nullptr;
-    ax::Rect rect;
 };
 
 class DrawNodePolygonTest : public DrawNodeBaseTest
@@ -473,29 +466,6 @@ public:
     CREATE_FUNC(DrawNodePolygonTest);
 
     DrawNodePolygonTest();
-
-    virtual std::string title() const override;
-    virtual std::string subtitle() const override;
-};
-
-
-class DrawNodeRoundRectTest : public DrawNodeBaseTest
-{
-public:
-    CREATE_FUNC(DrawNodeRoundRectTest);
-
-    DrawNodeRoundRectTest();
-
-    virtual std::string title() const override;
-    virtual std::string subtitle() const override;
-};
-
-class DrawNodeButtonTest : public DrawNodeBaseTest
-{
-public:
-    CREATE_FUNC(DrawNodeButtonTest);
-
-    DrawNodeButtonTest();
 
     virtual std::string title() const override;
     virtual std::string subtitle() const override;
@@ -522,19 +492,6 @@ private:
 };
 
 #if defined(AX_PLATFORM_PC)
-class DrawNodePointTest : public DrawNodeBaseTest
-{
-public:
-    CREATE_FUNC(DrawNodePointTest);
-
-    DrawNodePointTest();
-
-    virtual std::string title() const override;
-    virtual std::string subtitle() const override;
-
-    void update(float dt) override;
-};
-
 class CandyMixEeffect : public DrawNodeBaseTest
 {
 public:
