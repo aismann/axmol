@@ -1,5 +1,6 @@
 /****************************************************************************
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+* Copyright (c) 2025-2026 @aismann
+* Copyright (c) 2026-present Axmol Engine contributors (see AUTHORS.md).
 
  https://axmol.dev/
 
@@ -21,53 +22,10 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
- /****************************************************************************
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
-
- https://axmol.dev/
-
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights
- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- copies of the Software, and to permit persons to whom the Software is
- furnished to do so, subject to the following conditions:
-
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
- ****************************************************************************/
-
- //
- // Bug-350
- // http://code.google.com/p/cocos2d-iphone/issues/detail?id=350
- //
 
 #include "SimpleSVG.h"
 
 using namespace ax;
-
-//
-//struct CubicBezier
-//{
-//    Vec2 p0, p1, p2, p3;
-//};
-//
-//
-//struct SvgSubpath
-//{
-//    std::vector<ax::Vec2> points;
-//    ax::Color color;
-//    bool closed = false;
-//};
-
 
 std::vector<SimpleSVG::CubicBezier> SimpleSVG::svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1)
 {
@@ -257,13 +215,6 @@ std::vector<ax::Vec2> SimpleSVG::svgArcToPoints(ax::Vec2 p0,
     return out;
 }
 
-//=============================================================
-
-
-
-
-// === 3. Cubic & quadratic flattening
-
 void SimpleSVG::flattenCubic(const ax::Vec2& p0,
     const ax::Vec2& p1,
     const ax::Vec2& p2,
@@ -298,9 +249,6 @@ void SimpleSVG::flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Ve
         out.push_back(p);
     }
 }
-
-
-//==== 4. Tiny tokenizer for numbers/commands
 
 void SimpleSVG::SvgPathStream(const std::string& str)
 {
@@ -350,7 +298,6 @@ bool SimpleSVG::readString(std::string& v)
         return false;
     v = s;
     v = v.substr(0, v.find_first_of(", \t\n\r", 1));
-    AXLOGD("v: '{}'", v);
     char* end = s + v.length() + 1;
     if (end == s)
         return false;
@@ -584,6 +531,13 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
             break;
         }
     }
-    //  delete [] s;
+
+    // 
+    for (unsigned int i = 0; i < subpaths.size(); i++)
+        for (unsigned int n = 0; n < subpaths[i].points.size(); n++)
+            subpaths[i].points[n].y *= -1;
+
+
+
     return subpaths;
 }

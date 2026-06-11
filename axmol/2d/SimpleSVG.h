@@ -1,8 +1,6 @@
 /****************************************************************************
- Copyright (c) 2013      Zynga Inc.
- Copyright (c) 2013-2016 Chukong Technologies Inc.
- Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
- Copyright (c) 2019-present Axmol Engine contributors (see AUTHORS.md).
+* Copyright (c) 2025-2026 @aismann
+* Copyright (c) 2026-present Axmol Engine contributors (see AUTHORS.md).
 
  https://axmol.dev/
 
@@ -26,22 +24,13 @@
  ****************************************************************************/
 
 #pragma once
-
- /// @cond DO_NOT_SHOW
-
-#include <cmath>
 #include <vector>
 
 namespace ax
 {
-    class AX_DLL SimpleSVG : public Object
+    class AX_DLL SimpleSVG
     {
     public:
-        struct CubicBezier
-        {
-            Vec2 p0, p1, p2, p3;
-        };
-
         struct SvgSubpath
         {
             std::vector<ax::Vec2> points;
@@ -49,13 +38,19 @@ namespace ax
             bool closed = false;
         };
 
+        static std::vector<SimpleSVG::SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int curveSegments = 16, int arcSegments = 32);
+
+    private:
+        struct CubicBezier
+        {
+            Vec2 p0, p1, p2, p3;
+        };
+
         static std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1);
         static std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, ax::Vec2 p1, int segments = 32);  // number of output points
         static void flattenCubic(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, const ax::Vec2& p3, std::vector<ax::Vec2>& out, int segments);
         static void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments);
-        static std::vector<SimpleSVG::SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int curveSegments = 16, int arcSegments = 32);
-
-
+       
         static void SvgPathStream(const std::string& str);
 
         static void skipWs();
@@ -63,15 +58,13 @@ namespace ax
         static bool readFloat(float& v);
         static bool readString(std::string& v);
 
-        // Delete constructor to prevent instantiation
+        // Delete constructors to prevent instantiation
         SimpleSVG() = delete;
         SimpleSVG(const SimpleSVG&) = delete;
         SimpleSVG& operator=(const SimpleSVG&) = delete;
 
-    private:
-        static inline char* s;// = "Some string value";
+
+        static inline char* s; 
     };
 
 }  // namespace ax
-
-/// @endcond
