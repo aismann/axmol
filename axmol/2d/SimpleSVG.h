@@ -51,7 +51,7 @@ namespace ax
 
         static std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1);
         static std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, ax::Vec2 p1, int segments = 32);  // number of output points
-        static void flattenCubic(const ax::Vec2& p0,const ax::Vec2& p1,const ax::Vec2& p2,const ax::Vec2& p3,std::vector<ax::Vec2>& out,int segments);
+        static void flattenCubic(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, const ax::Vec2& p3, std::vector<ax::Vec2>& out, int segments);
         static void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments);
         static std::vector<SimpleSVG::SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int curveSegments = 16, int arcSegments = 32);
 

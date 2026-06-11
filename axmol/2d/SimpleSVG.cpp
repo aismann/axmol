@@ -382,8 +382,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
 
     while (*s != '\0')
     {
-
-        AXLOGD("s:   {}",s);
+        AXLOGD("s:   {}", s);
         char c;
         if (!readCommand(c))
         {
@@ -585,6 +584,6 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
             break;
         }
     }
-  //  delete [] s;
+    //  delete [] s;
     return subpaths;
 }
