@@ -449,6 +449,34 @@ public:
     ax::DrawNode* issue3094;
 };
 
+class DrawNodeSideEffect1Test : public DrawNodeBaseTest
+{
+public:
+    CREATE_FUNC(DrawNodeSideEffect1Test);
+
+    DrawNodeSideEffect1Test();
+
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+
+    void update(float dt) override;
+    void onEnter() override;
+};
+
+class DrawNodeSVGTest : public DrawNodeBaseTest
+{
+public:
+    CREATE_FUNC(DrawNodeSVGTest);
+
+    DrawNodeSVGTest();
+
+    virtual std::string title() const override;
+    virtual std::string subtitle() const override;
+
+    void update(float dt) override;
+    void onEnter() override;
+};
+
 #if defined(AX_PLATFORM_PC)
 
 const int GRID_W = 800;

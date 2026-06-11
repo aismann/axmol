@@ -31,9 +31,12 @@ class Bug350Layer : public BugsTestBase
 {
 public:
     CREATE_FUNC(Bug350Layer);
-
+    void callbackCountDown(ax::Node* node);
     virtual bool init() override;
     virtual std::string title() const override { return "Bug350"; }
+
+    ax::Label* label;
+    float duration;
 };
 
 #endif  // __BUG_350_H__
