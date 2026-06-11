@@ -31,7 +31,7 @@ std::vector<SimpleSVG::CubicBezier> SimpleSVG::svgArcToBezier(Vec2 p0, float rx,
 {
     std::vector<CubicBezier> curves;
 
-    // Step 1: Handle degenerate cases
+    // a line?
     if (rx == 0 || ry == 0)
     {
         curves.push_back({ p0, p0, p1, p1 });
@@ -92,12 +92,12 @@ std::vector<SimpleSVG::CubicBezier> SimpleSVG::svgArcToBezier(Vec2 p0, float rx,
     float dtheta = angle((x1 - cx1) / rx, (y1 - cy1) / ry, (-x1 - cx1) / rx, (-y1 - cy1) / ry);
 
     if (!sweepFlag && dtheta > 0)
-        dtheta -= 2 * 3.14159265358979323846f;
+        dtheta -= 2 * M_PI;
     if (sweepFlag && dtheta < 0)
-        dtheta += 2 * 3.14159265358979323846f;
+        dtheta += 2 * M_PI;
 
-    // Step 6: Split arc into segments of max 90°
-    int segments = std::ceil(std::fabs(dtheta) / (3.14159265358979323846f / 2));
+    // Split into segments of <= 90°
+    int segments = std::ceil(std::fabs(dtheta) / (M_PI / 2));
     float dt = dtheta / segments;
 
     for (int i = 0; i < segments; i++)
@@ -306,10 +306,7 @@ bool SimpleSVG::readString(std::string& v)
     return true;
 }
 
-
-
-
-// Full SVG path → Axmol polygons Supports    : M m L l H h V v C c Q q A a Z z #HEXCOLOR.
+// Full? SVG path → Axmol polygons Supports    : M m L l H h V v C c Q q A a Z z 
 std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const std::string& str, int curveSegments, int arcSegments)
 {
     s = new char[str.size()];; // Ensure enough space for string + null terminator
@@ -322,6 +319,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
     ax::Vec2 curr(0, 0), start(0, 0);
     ax::Vec2 lastCtrl(0, 0);
     char cmd = 0;
+
 
     auto newSubpath = [&]() {
         subpaths.emplace_back();
@@ -494,36 +492,6 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
             subpaths.back().closed = true;
             subpaths.back().points.push_back(start);
             curr = start;
-
-        }
-        else if (C == '#')  // color stuff
-        {
-
-            std::string sc;
-            subpaths.back().closed = true;
-
-            unsigned int red = 255;
-            unsigned int green = 255;
-            unsigned int blue = 255;
-            unsigned int alpha = 255;
-
-            if (sc.length() > 5)
-            {
-
-                red = std::stoul(sc.substr(2, 2), nullptr, 16);
-                green = std::stoul(sc.substr(2, 2), nullptr, 16);
-                blue = std::stoul(sc.substr(4, 2), nullptr, 16);
-                if (sc.length() > 6)
-                {
-                    alpha = std::stoul(sc.substr(6, 2), nullptr, 16);
-                }
-            }
-
-            ax::Color color = ax::Color(red, green, blue, alpha);
-
-            subpaths.back().color = color;
-            curr = start;
-            AXLOGD("Color: {}", sc);
         }
         else
         {

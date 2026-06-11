@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "extensions/ExtensionMacros.h"
 #include "ImGui/ImGuiPresenter.h"
 
+
+#include "axmol/2d/SimpleSVG.h"
+
 USING_NS_AX;
 USING_NS_AX_EXT;
 using namespace std;
@@ -3326,6 +3329,7 @@ DrawNodeSVGTest::DrawNodeSVGTest()
         circle2,
         cross,
         curve,
+        a, b, c, d, e, f, g, h, i, j, k,
         LAST_mySVG,
     };
 
@@ -3374,6 +3378,46 @@ DrawNodeSVGTest::DrawNodeSVGTest()
 
         { //curve 
             "M 150,100 A 70,50,0,1,0,150,100 A 70,50,0,1,1,150,100 A 70,50,0,0,0,150,100 A 70,50,0,0,1,250,150"},
+
+        { //1
+           "M 213.1,6.7 c -32.4 -14.4 -73.7,0 -88.1, 30.6 C 110.6, 4.9, 67.5 -9.5, 36.9, 6.7 C 2.8, 22.9 -13.4, 62.4, 13.5, 110.9 C 33.3,145.1, 67.5, 170.3, 125, 217"
+           "c 59.3 -46.7, 93.5 -71.9, 111.5 -106.1 C 263.4, 64.2, 247.2, 22.9,213.1,6.7 z "},
+
+        { //2
+           "M 25, 100 C 25, 150 75, 150 75, 100 S 100, 25 150, 75 "},
+
+        { //3
+         "M300, 200 h -150 a 150, 150 0 1, 0 150, -150 z M 275,175 v -150 a 150,150 0 0,0 -150,150 z"},
+
+        { // 4
+            "M 60,350 l 50,-25 a 25, 25 -30 0, 1 50, -25 l 50, -25 a 25, 50 -30 0, 1 50, -25 l 50, -25 a 25, 75 -30 0, 1 50, -25 l 50, -25 a 25, 100 -30 0, 1 50, -25 l 50, -25"},
+
+        { // 5
+        "M 140 20 C 73,20 20,74 20,140 c 0 135 136 170 228 303 c 88 -132 229 -173 229 -303 c 0 -66 -54 -120 -120 -120 c -48 0 -90 28 -109 69 c -19 -41 -60 -69 -108 -69 z"},
+
+        { // 6
+            "M 6,-32 Q 26,-28 46,-19 Q 57,-35 64,-47 Q 50,-68 37,-76 Q 17,-75 1,-68 Q 4,-51 6,-32 M -26,-2 Q -45,-8 -62,-11 "
+            "Q -74,5 -76,22 Q -69,40 -50,54 Q -32,47 -17,39 Q -23,15 -26,-2 M -95,22 Q -102, 12 -102,-8 V 80 H -85 Q -95,45 -95,22 "
+            "M 55,24 Q 41,41 24,52 Q 28,65 31,79 Q 55,78 68,67 Q 78,50 80,35 Q 65,28 55,24 M 0,120 L -3,95 Q -25,93 -42,82 "
+            "Q -50,84 -60,81 M -90,-48 Q -80,-52 -68,-49 Q -52,-71 -35,-77 Q -35,-100 -40,-100 H -100 M 100,-55 L 87,-37 Q 98,-10 97,5 L 100,6"
+            "M 6,-32 Q -18,-12 -26,-2 M 46,-19 Q 54,5 55,24 M 64,-47 Q 77,-44 87,-37 M 37,-76 Q 39,-90 36,-100 M 1,-68 Q -13,-77 -35,-77 "
+            "M -62,-11 Q -67,-25 -68,-49 M -76,22 Q -85,24 -95,22 M -50,54 Q -49,70 -42,82 M -17,39 Q 0,48 24,52"
+            "M 31,79 Q 20,92 -3,95 M 68,67 L 80,80 M 80,35 Q 90,25 97,5"},
+
+        { //7
+            "M 125,75 a 100,50 0 1,1 100,50"},
+
+        { // 8
+            "M110 180 C20 120 20 40 70 40 C95 40 110 60 110 60 C110 60 125 40 150 40 C200 40 200 120 110 180 Z"},
+
+        {  // 9
+                "M30 30 H230 Q240 30 240 40 V90 Q240 100 230 100 H120 L90 130 L95 100 H30 Q20 100 20 90 V40 Q20 30 30 30 Z"},
+
+        { //10
+        "M0 60 C40 20 80 20 120 60 C160 100 200 100 240 60 C280 20 320 20 360 60"},
+
+        { //11
+        "M 40,20 A30,30 0 1,0 70,70 M 40,20 A 30,30 0 1,1 70,70 M 40,20  A 30,30 0 0,0 70,70 M 40,20 A 30,30 0 0,1 70,70"},
     };
 
     //Der Anweisung A oder a müssen 5 Werte und ein Koordinatenpunkt folgen:
@@ -3405,164 +3449,20 @@ DrawNodeSVGTest::DrawNodeSVGTest()
     //   Kleinbuchstaben leiten eine relative Angabe ein. Hier werden alle Werte im Bezug zum direkt vorher definierten Punkt des Pfades interpretiert.
 
 
-
+    drawNode->setPosition(200, 200);
+    drawNode->setScale(0.5);
     std::vector<std::vector<ax::Vec2>> pathes[mySVG::LAST_mySVG];
     for (int i = 0; i < mySVG::LAST_mySVG; i++)
     {
-  //      pathes[i] = drawNode->getSVGPathes(mySVGs[i]);
-    }
-    //  for (int i = 0; i < mySVG::path3; i++)
-    {
-
-        int i = mySVG::curve;
-    //    pathes[i] = drawNode->getSVGPathes(mySVGs[i]);
-
-        for (auto&& path : pathes[i])
+        auto subpaths = SimpleSVG::parseSvgPathToAxmolPolygons(mySVGs[i], 24, 24);
+        for (auto& sp : subpaths)
         {
-            if (path.size())
-            {
-                Vec2* vertices = new Vec2[path.size()];
-                for (unsigned int ii = 0; ii < path.size(); ii++)
-                {
-                    vertices[ii] = path[ii];
-                }
-                drawNode->setLocalTransformEnabled(true);
-                drawNode->setLocalPosition({ 50,200 });
-                drawNode->setLocalScale({ 1,1 });
-                //     drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-                drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-                drawNode->setLocalScale({ 0.8,0.8 });
-                //     drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-                drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-                drawNode->setLocalScale({ 0.6,0.6 });
-                //     drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-                drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-                drawNode->setLocalScale({ 0.4,0.4 });
-                //    drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-                drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-
-
-
-
-
-                //drawNode->setLocalTransformEnabled(true);
-                //drawNode->setLocalPosition({ 125, 365 });
-                //drawNode->setLocalScale({ 1,1 });
-                //drawNode->drawPoly(vertices, path.size() - 1, false, Color(0.8, 0.8, 0, 0.5), 3.0f);
-                drawNode->setLocalTransformEnabled(false);
-                AX_SAFE_DELETE_ARRAY(vertices);
-            }
+            if (sp.points.size() < 2)
+                continue;
+            drawNode->drawPoly(sp.points.data(), sp.points.size(), 0, ax::Color::WHITE);
         }
     }
-
-
-    //drawNode->setLocalTransformEnabled(true);
-    //for (auto&& path : pathes1)
-    //{
-    //    AXLOGD("path.size() {}", path.size());
-    //    if (path.size())
-    //    {
-    //        Vec2* vertices = new Vec2[path.size()];
-    //        for (int i = 0; i < path.size(); i++)
-    //        {
-    //            vertices[i] = path[i];
-    //        }
-
-    //        drawNode->setLocalPosition({ 150,300 });
-    //        drawNode->drawPolygon(vertices, path.size(), 2.0f, Color::RED);
-    //    }
-    //}
-    //for (auto&& path : pathes2)
-    //{
-    //    AXLOGD("path.size() {}", path.size());
-    //    if (path.size())
-    //    {
-    //        Vec2* vertices = new Vec2[path.size()];
-    //        for (int i = 0; i < path.size(); i++)
-    //        {
-    //            vertices[i] = path[i];
-    //        }
-
-    //        drawNode->setLocalPosition({ 150,400 });
-    //        drawNode->setLocalScale({ 1,1 });
-    //        drawNode->drawPoly(vertices, path.size(), false, Color::YELLOW);
-    //        //   drawNode->drawSolidPoly(vertices, path.size(), Color(0.8,0.8,0,0.5), 2.0f, Color(0.5,0.5,0,0.5));
-    //    }
-    //}
-    ////for (auto&& path: pathes3)
-    ////{
-    ////    AXLOGD("path.size() {}", path.size());
-    ////    if (path.size())
-    ////    {
-    ////        Vec2* vertices = new Vec2[path.size()];
-    ////        for (int i = 0; i <  path.size(); i++)
-    ////        {
-    ////            vertices[i] = path[i];
-    ////        }
-
-    ////        drawNode->setLocalPosition({ 150,200 });
-    ////        drawNode->drawPoly(vertices, path.size(),false, Color::GREEN);
-    ////    }
-    ////}
-    //for (auto&& path : buttons2)
-    //{
-    //    if (path.size())
-    //    {
-    //        Vec2* vertices = new Vec2[path.size()];
-    //        for (int i = 0; i < path.size(); i++)
-    //        {
-    //            vertices[i] = path[i];
-    //        }
-
-    //        drawNode->setLocalPosition({ 50,200 });
-    //        drawNode->setLocalScale({ 1,1 });
-    //        //     drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-    //        drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-    //        drawNode->setLocalScale({ 0.8,0.8 });
-    //        //     drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-    //        drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-    //        drawNode->setLocalScale({ 0.6,0.6 });
-    //        //     drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-    //        drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-    //        drawNode->setLocalScale({ 0.4,0.4 });
-    //        //    drawNode->drawPoly(vertices, path.size(), false, Color::BLUE, 3.0f);
-    //        drawNode->drawSolidPoly(vertices, path.size(), Color(0, 0, 0.8, 0.5), 3.0f, Color(0, 0, 0.8, 0.5));
-    //    }
-    //}
-
-    //for (auto&& path : circles1)
-    //{
-    //    if (path.size())
-    //    {
-    //        Vec2* vertices = new Vec2[path.size()];
-    //        for (int i = 0; i < path.size(); i++)
-    //        {
-    //            vertices[i] = path[i];
-    //        }
-
-    //        drawNode->setLocalPosition({ 250, -50 });
-    //        drawNode->setLocalScale({ 1,1 });
-    //        drawNode->drawPoly(vertices, path.size() - 1, false, Color(0.8, 0.8, 0, 0.5), 3.0f);
-    //    }
-    //}
-
-
-    //for (auto&& path : circles2)
-    //{
-    //    if (path.size())
-    //    {
-    //        Vec2* vertices = new Vec2[path.size()];
-    //        for (int i = 0; i < path.size(); i++)
-    //        {
-    //            vertices[i] = path[i];
-    //        }
-
-    //        drawNode->setLocalPosition({ 250, -50 });
-    //        drawNode->setLocalScale({ 1,1 });
-    //        drawNode->drawPoly(vertices, path.size() - 1, false, Color(0, 0.8, 0.8, 0.5), 3.0f);
-    //    }
-    //}
-    //scheduleUpdate();
+    scheduleUpdate();
 }
 
 void DrawNodeSVGTest::onEnter()
