@@ -34,8 +34,6 @@
 
 namespace ax
 {
-
-
     class AX_DLL SimpleSVG : public Object
     {
     public:
@@ -51,83 +49,27 @@ namespace ax
             bool closed = false;
         };
 
-        std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1);
-        std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0,
-            float rx,
-            float ry,
-            float xAxisRotation,
-            bool largeArcFlag,
-            bool sweepFlag,
-            ax::Vec2 p1,
-            int segments = 32);  // number of output points
-        // === 3. Cubic & quadratic flattening
-
-        void flattenCubic(const ax::Vec2& p0,
-            const ax::Vec2& p1,
-            const ax::Vec2& p2,
-            const ax::Vec2& p3,
-            std::vector<ax::Vec2>& out,
-            int segments);
-
-        void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments);
-        std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int curveSegments = 16, int arcSegments = 32);
-    };
-
-    //Tiny tokenizer for numbers/commands
-    class AX_DLL SvgPathStream
-    {
-        const char* s;
-        SvgPathStream(const std::string& str) : s(str.c_str()) {}
+        static std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1);
+        static std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, ax::Vec2 p1, int segments = 32);  // number of output points
+        static void flattenCubic(const ax::Vec2& p0,const ax::Vec2& p1,const ax::Vec2& p2,const ax::Vec2& p3,std::vector<ax::Vec2>& out,int segments);
+        static void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments);
+        static std::vector<SimpleSVG::SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int curveSegments = 16, int arcSegments = 32);
 
 
-        void skipWs()
-        {
-            while (*s && (std::isspace((unsigned char)*s) || *s == ','))
-                ++s;
-        }
+        static void SvgPathStream(const std::string& str);
 
-        bool eof() const { return *s == '\0'; }
+        static void skipWs();
+        static bool readCommand(char& c);
+        static bool readFloat(float& v);
+        static bool readString(std::string& v);
 
-        bool readCommand(char& c)
-        {
-            skipWs();
-            if (!*s)
-                return false;
-            if (std::isalpha((unsigned char)*s) || (*s == '#'))
-            {
-                c = *s++;
-                return true;
-            }
-            return false;
-        }
+        // Delete constructor to prevent instantiation
+        SimpleSVG() = delete;
+        SimpleSVG(const SimpleSVG&) = delete;
+        SimpleSVG& operator=(const SimpleSVG&) = delete;
 
-        bool readFloat(float& v)
-        {
-            skipWs();
-            if (!*s)
-                return false;
-            char* end = nullptr;
-            v = std::strtof(s, &end);
-            if (end == s)
-                return false;
-            s = end;
-            return true;
-        }
-        bool readString(std::string& v)
-        {
-            skipWs();
-            if (!*s)
-                return false;
-            v = s;
-            v = v.substr(0, v.find_first_of(", \t\n\r", 1));
-            AXLOGD("v: '{}'", v);
-            const char* end = s + v.length() + 1;
-            if (end == s)
-                return false;
-            s = end;
-            AXLOGD("ss: '{}'", s);
-            return true;
-        }
+    private:
+        static inline char* s;// = "Some string value";
     };
 
 }  // namespace ax

@@ -21,55 +21,55 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-/****************************************************************************
-Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
+ /****************************************************************************
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
-https://axmol.dev/
+ https://axmol.dev/
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-****************************************************************************/
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
 
-//
-// Bug-350
-// http://code.google.com/p/cocos2d-iphone/issues/detail?id=350
-//
+ //
+ // Bug-350
+ // http://code.google.com/p/cocos2d-iphone/issues/detail?id=350
+ //
 
 #include "SimpleSVG.h"
 
 using namespace ax;
 
+//
+//struct CubicBezier
+//{
+//    Vec2 p0, p1, p2, p3;
+//};
+//
+//
+//struct SvgSubpath
+//{
+//    std::vector<ax::Vec2> points;
+//    ax::Color color;
+//    bool closed = false;
+//};
 
-// struct CubicBezier
-// {
-    // Vec2 p0, p1, p2, p3;
-// };
 
-
-// struct SvgSubpath
-// {
-    // std::vector<ax::Vec2> points;
-    // ax::Color color;
-    // bool closed = false;
-// };
-
-
-std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1)
+std::vector<SimpleSVG::CubicBezier> SimpleSVG::svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1)
 {
     std::vector<CubicBezier> curves;
 
@@ -168,14 +168,14 @@ std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxis
     return curves;
 }
 
-std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0,
+std::vector<ax::Vec2> SimpleSVG::svgArcToPoints(ax::Vec2 p0,
     float rx,
     float ry,
     float xAxisRotation,
     bool largeArcFlag,
     bool sweepFlag,
     ax::Vec2 p1,
-    int segments = 32)  // number of output points
+    int segments)  // number of output points
 {
     std::vector<ax::Vec2> out;
     out.reserve(segments + 1);
@@ -237,9 +237,9 @@ std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0,
     float dtheta = angle((x1 - cx1) / rx, (y1 - cy1) / ry, (-x1 - cx1) / rx, (-y1 - cy1) / ry);
 
     if (!sweepFlag && dtheta > 0)
-        dtheta -= 2 * 3.14159265358979323846f;
+        dtheta -= 2 * M_PI;
     if (sweepFlag && dtheta < 0)
-        dtheta += 2 * 3.14159265358979323846f;
+        dtheta += 2 * M_PI;
 
     // Generate points
     for (int i = 0; i <= segments; i++)
@@ -264,7 +264,7 @@ std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0,
 
 // === 3. Cubic & quadratic flattening
 
-void flattenCubic(const ax::Vec2& p0,
+void SimpleSVG::flattenCubic(const ax::Vec2& p0,
     const ax::Vec2& p1,
     const ax::Vec2& p2,
     const ax::Vec2& p3,
@@ -285,7 +285,7 @@ void flattenCubic(const ax::Vec2& p0,
     }
 }
 
-void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments)
+void SimpleSVG::flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments)
 {
     for (int i = 1; i <= segments; ++i)
     {
@@ -302,69 +302,76 @@ void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std
 
 //==== 4. Tiny tokenizer for numbers/commands
 
-struct SvgPathStream
+void SimpleSVG::SvgPathStream(const std::string& str)
 {
-    const char* s;
-    SvgPathStream(const std::string& str) : s(str.c_str()) {}
+    s = new char[str.size()];; // Ensure enough space for string + null terminator
+    size_t len = str.copy(s, str.size());
+    s[len] = '\0'; // Null-terminate
+}
 
 
-    void skipWs()
-    {
-        while (*s && (std::isspace((unsigned char)*s) || *s == ','))
-            ++s;
-    }
+void SimpleSVG::skipWs()
+{
+    while (*s && (std::isspace((unsigned char)*s) || *s == ','))
+        ++s;
+}
 
-    bool eof() const { return *s == '\0'; }
+//bool SimpleSVG::eof() { return *s == '\0'; }
 
-    bool readCommand(char& c)
-    {
-        skipWs();
-        if (!*s)
-            return false;
-        if (std::isalpha((unsigned char)*s) || (*s == '#'))
-        {
-            c = *s++;
-            return true;
-        }
+bool SimpleSVG::readCommand(char& c)
+{
+    skipWs();
+    if (!*s)
         return false;
+    if (std::isalpha((unsigned char)*s) || (*s == '#'))
+    {
+        c = *s++;
+        return true;
     }
+    return false;
+}
 
-    bool readFloat(float& v)
-    {
-        skipWs();
-        if (!*s)
-            return false;
-        char* end = nullptr;
-        v = std::strtof(s, &end);
-        if (end == s)
-            return false;
-        s = end;
-        return true;
-    }
-    bool readString(std::string& v)
-    {
-        skipWs();
-        if (!*s)
-            return false;
-        v = s;
-        v = v.substr(0, v.find_first_of(", \t\n\r", 1));
-        AXLOGD("v: '{}'", v);
-        const char* end = s + v.length() + 1;
-        if (end == s)
-            return false;
-        s = end;
-        AXLOGD("ss: '{}'", s);
-        return true;
-    }
-};
+bool SimpleSVG::readFloat(float& v)
+{
+    skipWs();
+    if (!*s)
+        return false;
+    char* end = nullptr;
+    v = std::strtof(s, &end);
+    if (end == s)
+        return false;
+    s = end;
+    return true;
+}
+bool SimpleSVG::readString(std::string& v)
+{
+    skipWs();
+    if (!*s)
+        return false;
+    v = s;
+    v = v.substr(0, v.find_first_of(", \t\n\r", 1));
+    AXLOGD("v: '{}'", v);
+    char* end = s + v.length() + 1;
+    if (end == s)
+        return false;
+    s = end;
+    AXLOGD("ss: '{}'", s);
+    return true;
+}
+
 
 
 
 // Full SVG path → Axmol polygons Supports    : M m L l H h V v C c Q q A a Z z #HEXCOLOR.
-std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int curveSegments = 16, int arcSegments = 32)
+std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const std::string& str, int curveSegments, int arcSegments)
 {
-    SvgPathStream st(d);
+    s = new char[str.size()];; // Ensure enough space for string + null terminator
+    size_t len = str.copy(s, str.size());
+    s[len] = '\0'; // Null-terminate
+
+    AXLOGD("s:   {}",s);
     std::vector<SvgSubpath> subpaths;
+    std::string st = s;
 
     ax::Vec2 curr(0, 0), start(0, 0);
     ax::Vec2 lastCtrl(0, 0);
@@ -374,10 +381,11 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
         subpaths.emplace_back();
         };
 
-    while (!st.eof())
+    while (st.length() >0)
     {
+        AXLOGD("st.length():   {}",st.length());
         char c;
-        if (!st.readCommand(c))
+        if (!readCommand(c))
         {
             if (!cmd)
                 break;
@@ -387,14 +395,14 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
         {
             cmd = c;
         }
-        AXLOGD("st.c: '{}'", st.s);
+        AXLOGD("st.c: '{}'", SimpleSVG::s);
         bool rel = (c >= 'a' && c <= 'z');
         char C = std::toupper(c);
 
         if (C == 'M')
         {
             float x, y;
-            if (!st.readFloat(x) || !st.readFloat(y))
+            if (!readFloat(x) || !readFloat(y))
                 break;
             if (rel)
             {
@@ -412,7 +420,7 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
             while (true)
             {
                 float x2, y2;
-                if (!st.readFloat(x2) || !st.readFloat(y2))
+                if (!readFloat(x2) || !readFloat(y2))
                     break;
                 if (rel)
                 {
@@ -431,7 +439,7 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
                 float x = curr.x, y = curr.y;
                 if (C == 'L')
                 {
-                    if (!st.readFloat(x) || !st.readFloat(y))
+                    if (!readFloat(x) || !readFloat(y))
                         break;
                     if (rel)
                     {
@@ -441,7 +449,7 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
                 }
                 else if (C == 'H')
                 {
-                    if (!st.readFloat(x))
+                    if (!readFloat(x))
                         break;
                     if (rel)
                         x += curr.x;
@@ -449,7 +457,7 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
                 }
                 else
                 {  // V
-                    if (!st.readFloat(y))
+                    if (!readFloat(y))
                         break;
                     if (rel)
                         y += curr.y;
@@ -464,8 +472,8 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
             while (true)
             {
                 float x1, y1, x2, y2, x, y;
-                if (!st.readFloat(x1) || !st.readFloat(y1) || !st.readFloat(x2) || !st.readFloat(y2) ||
-                    !st.readFloat(x) || !st.readFloat(y))
+                if (!readFloat(x1) || !readFloat(y1) || !readFloat(x2) || !readFloat(y2) ||
+                    !readFloat(x) || !readFloat(y))
                     break;
 
                 if (rel)
@@ -492,7 +500,7 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
             while (true)
             {
                 float x1, y1, x, y;
-                if (!st.readFloat(x1) || !st.readFloat(y1) || !st.readFloat(x) || !st.readFloat(y))
+                if (!readFloat(x1) || !readFloat(y1) || !readFloat(x) || !readFloat(y))
                     break;
 
                 if (rel)
@@ -517,8 +525,8 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
             while (true)
             {
                 float rx, ry, xRot, laf, sf, x, y;
-                if (!st.readFloat(rx) || !st.readFloat(ry) || !st.readFloat(xRot) || !st.readFloat(laf) ||
-                    !st.readFloat(sf) || !st.readFloat(x) || !st.readFloat(y))
+                if (!readFloat(rx) || !readFloat(ry) || !readFloat(xRot) || !readFloat(laf) ||
+                    !readFloat(sf) || !readFloat(x) || !readFloat(y))
                     break;
 
                 if (rel)
@@ -568,7 +576,7 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
             ax::Color color = ax::Color(red, green, blue, alpha);
 
             subpaths.back().color = color;
-            // curr = start;
+            curr = start;
             AXLOGD("Color: {}", sc);
         }
         else
@@ -577,6 +585,6 @@ std::vector<SvgSubpath> parseSvgPathToAxmolPolygons(const std::string& d, int cu
             break;
         }
     }
-
+    delete [] s;
     return subpaths;
 }
