@@ -43,28 +43,27 @@ namespace ax
     private:
         struct CubicBezier
         {
-            Vec2 p0, p1, p2, p3;
+            ax::Vec2 p0, p1, p2, p3;
         };
 
-        static std::vector<CubicBezier> svgArcToBezier(Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, Vec2 p1);
+        static std::vector<CubicBezier> svgArcToBezier(ax::Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, ax::Vec2 p1);
         static std::vector<ax::Vec2> svgArcToPoints(ax::Vec2 p0, float rx, float ry, float xAxisRotation, bool largeArcFlag, bool sweepFlag, ax::Vec2 p1, int segments = 32);  // number of output points
         static void flattenCubic(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, const ax::Vec2& p3, std::vector<ax::Vec2>& out, int segments);
         static void flattenQuad(const ax::Vec2& p0, const ax::Vec2& p1, const ax::Vec2& p2, std::vector<ax::Vec2>& out, int segments);
-       
+
         static void SvgPathStream(const std::string& str);
 
-        static void skipWs();
+        static void skipChars();
         static bool readCommand(char& c);
         static bool readFloat(float& v);
-        static bool readString(std::string& v);
+     //   static bool readString(std::string& v);
 
         // Delete constructors to prevent instantiation
         SimpleSVG() = delete;
         SimpleSVG(const SimpleSVG&) = delete;
         SimpleSVG& operator=(const SimpleSVG&) = delete;
 
-
-        static inline char* s; 
+        static inline char* s;
     };
 
 }  // namespace ax
