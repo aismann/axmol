@@ -6,7 +6,7 @@
 
 ## astcenc
 - [![Upstream](https://img.shields.io/github/v/release/ARM-software/astc-encoder?label=Upstream)](https://github.com/ARM-software/astc-encoder)
-- Version: 5.4.0
+- Version: 5.5.0
 - License: Apache-2.0
 
 ## Box2D
@@ -51,7 +51,7 @@
 
 ## fast_float
 - [![Upstream](https://img.shields.io/github/v/release/fastfloat/fast_float?label=Upstream)](https://github.com/fastfloat/fast_float)
-- Version: 8.2.5
+- Version: 8.2.9
 - License: MIT
 
 ## flatbuffers
@@ -81,7 +81,7 @@
 
 ## glfw
 - [![Upstream](https://img.shields.io/github/v/release/glfw/glfw?label=Upstream)](https://github.com/glfw/glfw)
-- Version: 3.5-2f3efb7 of https://github.com/axmolengine/glfw
+- Version: 3.5-12d2696 of https://github.com/axmolengine/glfw
 - License: zlib
 
 ## ghc (iOS < 13 ONLY)
@@ -127,7 +127,7 @@
 
 - luajit
   - Upstream: https://github.com/LuaJIT/LuaJIT
-  - Version: 2.1-18b087c
+  - Version: 2.1-b925b3e
   - License: MIT
 
 - tolua
@@ -195,7 +195,7 @@
 
 ## OpenSSL
 - [![Upstream](https://img.shields.io/github/v/release/openssl/openssl?label=Upstream)](https://github.com/openssl/openssl)
-- Version: 3.0.20
+- Version: 3.0.21
 - License: Apache-2.0
 
 ## png
@@ -235,7 +235,7 @@
 
 ## simdjson
 - [![Upstream](https://img.shields.io/github/v/tag/simdjson/simdjson?label=Upstream)](https://github.com/simdjson/simdjson)
-- Version: 4.6.3
+- Version: 4.6.4
 - License: Apache-2.0
 
 ## stb (stb_image)

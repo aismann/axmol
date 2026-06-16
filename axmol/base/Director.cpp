@@ -53,7 +53,7 @@ THE SOFTWARE.
 #include "axmol/base/Scheduler.h"
 #include "axmol/base/Macros.h"
 #include "axmol/base/EventDispatcher.h"
-#include "axmol/base/EventCustom.h"
+#include "axmol/base/CustomEvent.h"
 #include "axmol/base/Logging.h"
 #include "axmol/base/AutoreleasePool.h"
 #include "axmol/base/Environment.h"
@@ -90,7 +90,7 @@ std::string_view Director::EVENT_BEFORE_UPDATE         = "director_before_update
 std::string_view Director::EVENT_AFTER_UPDATE          = "director_after_update"sv;
 std::string_view Director::EVENT_BEFORE_DRAW           = "director_before_draw"sv;
 std::string_view Director::EVENT_RESET                 = "director_reset"sv;
-std::string_view Director::EVENT_DESTROY               = "director_destroy"sv;
+std::string_view Director::EVENT_DISPOSING             = "director_disposing"sv;
 std::string_view Director::EVENT_BEFORE_GFX_DROP       = "director_before_gfx_drop"sv;
 std::string_view Director::EVENT_AFTER_GFX_DROP        = "director_after_gfx_drop"sv;
 
@@ -124,7 +124,11 @@ Director* Director::getInstance()
 
 void Director::destroyInstance()
 {
-    AX_SAFE_DELETE(s_SharedDirector);
+    if (s_SharedDirector)
+    {
+        s_SharedDirector->dispatchDisposing();
+        AX_SAFE_DELETE(s_SharedDirector);
+    }
 }
 
 Director::Director() {}
@@ -152,31 +156,31 @@ bool Director::init()
 
     _eventDispatcher = new EventDispatcher();
 
-    _beforeSetNextScene = new EventCustom(EVENT_BEFORE_SET_NEXT_SCENE);
+    _beforeSetNextScene = new CustomEvent(EVENT_BEFORE_SET_NEXT_SCENE);
     _beforeSetNextScene->setUserData(this);
-    _afterSetNextScene = new EventCustom(EVENT_AFTER_SET_NEXT_SCENE);
+    _afterSetNextScene = new CustomEvent(EVENT_AFTER_SET_NEXT_SCENE);
     _afterSetNextScene->setUserData(this);
-    _eventAfterDraw = new EventCustom(EVENT_AFTER_DRAW);
+    _eventAfterDraw = new CustomEvent(EVENT_AFTER_DRAW);
     _eventAfterDraw->setUserData(this);
-    _eventBeforeDraw = new EventCustom(EVENT_BEFORE_DRAW);
+    _eventBeforeDraw = new CustomEvent(EVENT_BEFORE_DRAW);
     _eventBeforeDraw->setUserData(this);
-    _eventAfterVisit = new EventCustom(EVENT_AFTER_VISIT);
+    _eventAfterVisit = new CustomEvent(EVENT_AFTER_VISIT);
     _eventAfterVisit->setUserData(this);
-    _eventBeforeUpdate = new EventCustom(EVENT_BEFORE_UPDATE);
+    _eventBeforeUpdate = new CustomEvent(EVENT_BEFORE_UPDATE);
     _eventBeforeUpdate->setUserData(this);
-    _eventAfterUpdate = new EventCustom(EVENT_AFTER_UPDATE);
+    _eventAfterUpdate = new CustomEvent(EVENT_AFTER_UPDATE);
     _eventAfterUpdate->setUserData(this);
-    _eventProjectionChanged = new EventCustom(EVENT_PROJECTION_CHANGED);
+    _eventProjectionChanged = new CustomEvent(EVENT_PROJECTION_CHANGED);
     _eventProjectionChanged->setUserData(this);
 
-    _eventResetDirector = new EventCustom(EVENT_RESET);
-    _eventResetDirector->setUserData(this);
-    _eventDestroyDirector = new EventCustom(EVENT_DESTROY);
-    _eventDestroyDirector->setUserData(this);
+    _eventDirectorReset = new CustomEvent(EVENT_RESET);
+    _eventDirectorReset->setUserData(this);
+    _eventDirectorDisposing = new CustomEvent(EVENT_DISPOSING);
+    _eventDirectorDisposing->setUserData(this);
 
-    _eventBeforeGfxDrop = new EventCustom(EVENT_BEFORE_GFX_DROP);
+    _eventBeforeGfxDrop = new CustomEvent(EVENT_BEFORE_GFX_DROP);
     _eventBeforeGfxDrop->setUserData(this);
-    _eventAfterGfxDrop = new EventCustom(EVENT_AFTER_GFX_DROP);
+    _eventAfterGfxDrop = new CustomEvent(EVENT_AFTER_GFX_DROP);
     _eventAfterGfxDrop->setUserData(this);
 
     // init TextureCache
@@ -187,7 +191,7 @@ bool Director::init()
 
 #if AX_ENABLE_CONTEXT_LOSS_RECOVERY
     // listen the event that renderer was recreated on Android/WP8
-    _rendererRecreatedListener = EventListenerCustom::create(EVENT_RENDERER_RECREATED, [this](EventCustom*) {
+    _rendererRecreatedListener = CustomEventListener::create(EVENT_RENDERER_RECREATED, [this](CustomEvent*) {
         _isStatusLabelUpdated = true;  // Force recreation of textures
         rhi::SamplerCache::getInstance()->rebuild();
         rhi::ShaderCache::getInstance()->recompileAll();
@@ -202,8 +206,6 @@ bool Director::init()
 Director::~Director()
 {
     AXLOGD("deallocing Director: {}", fmt::ptr(this));
-
-    _eventDispatcher->dispatchEvent(_eventDestroyDirector);
 
 #if AX_ENABLE_CONTEXT_LOSS_RECOVERY
     _eventDispatcher->removeEventListener(_rendererRecreatedListener);
@@ -222,8 +224,8 @@ Director::~Director()
     AX_SAFE_RELEASE(_eventBeforeDraw);
     AX_SAFE_RELEASE(_eventAfterVisit);
     AX_SAFE_RELEASE(_eventProjectionChanged);
-    AX_SAFE_RELEASE(_eventResetDirector);
-    AX_SAFE_RELEASE(_eventDestroyDirector);
+    AX_SAFE_RELEASE(_eventDirectorReset);
+    AX_SAFE_RELEASE(_eventDirectorDisposing);
     AX_SAFE_RELEASE(_eventBeforeGfxDrop);
     AX_SAFE_RELEASE(_eventAfterGfxDrop);
 #ifdef AX_ENABLE_CONSOLE
@@ -248,6 +250,11 @@ Director::~Director()
     PoolManager::destroyInstance();
 
     s_SharedDirector = nullptr;
+}
+
+void Director::dispatchDisposing()
+{
+    _eventDispatcher->dispatchEvent(_eventDirectorDisposing);
 }
 
 void Director::setDefaultValues()
@@ -320,6 +327,7 @@ void Director::drawScene()
     {
         _eventDispatcher->dispatchEvent(_eventBeforeUpdate);
         _scheduler->update(_deltaTime);
+        performFrameTasks(_nextUpdateTasks);
         _eventDispatcher->dispatchEvent(_eventAfterUpdate);
     }
 
@@ -428,9 +436,9 @@ float Director::getDeltaTime() const
     return _deltaTime;
 }
 
-void Director::setRenderView(RenderView* renderView)
+void Director::setRenderView(RenderViewCore* renderView)
 {
-    AXASSERT(renderView, "opengl view should not be null");
+    AXASSERT(renderView, "RenderView should not be null");
 
     if (_renderView != renderView)
     {
@@ -747,8 +755,15 @@ static void getViewProjMatrix(Mat4* transformOut)
     *transformOut    = projection * modelview;
 }
 
-Vec2 Director::screenToWorld(const Vec2& uiPoint)
+Vec2 Director::screenToWorld(const Vec2& screenPoint)
 {
+    auto& viewScale = _renderView->getScale();
+    auto& vp        = _renderView->getViewportRect();
+
+    // Convert screen point to Axmol 2D(UI) point
+    float uiX = (screenPoint.x - vp.origin.x) / viewScale.x;
+    float uiY = (screenPoint.y - vp.origin.y) / viewScale.y;
+
     Mat4 transform;
     getViewProjMatrix(&transform);
 
@@ -758,24 +773,23 @@ Vec2 Director::screenToWorld(const Vec2& uiPoint)
     float zClip = transform.m[14] / transform.m[15];
 
     Vec2 designSize = _renderView->getDesignResolutionSize();
-    Vec4 clipCoord(2.0f * uiPoint.x / designSize.width - 1.0f, 1.0f - 2.0f * uiPoint.y / designSize.height, zClip, 1);
+    Vec4 clipCoord(2.0f * uiX / designSize.width - 1.0f, 1.0f - 2.0f * uiY / designSize.height, zClip, 1);
 
-    Vec4 glCoord;
-    // transformInv.transformPoint(clipCoord, &glCoord);
-    transformInv.transformVector(clipCoord, &glCoord);
-    float factor = 1.0f / glCoord.w;
-    return Vec2(glCoord.x * factor, glCoord.y * factor);
+    Vec4 uiPoint;
+    transformInv.transformVector(clipCoord, &uiPoint);
+    float factor = 1.0f / uiPoint.w;
+    return Vec2{uiPoint.x * factor, uiPoint.y * factor};
 }
 
-Vec2 Director::worldToScreen(const Vec2& glPoint)
+Vec2 Director::worldToScreen(const Vec2& worldPoint)
 {
     Mat4 transform;
     getViewProjMatrix(&transform);
 
     Vec4 clipCoord;
     // Need to calculate the zero depth from the transform.
-    Vec4 glCoord(glPoint.x, glPoint.y, 0.0, 1);
-    transform.transformVector(glCoord, &clipCoord);
+    Vec4 worldCoord(worldPoint.x, worldPoint.y, 0.0, 1);
+    transform.transformVector(worldCoord, &clipCoord);
 
     /*
     BUG-FIX #5506
@@ -790,9 +804,14 @@ Vec2 Director::worldToScreen(const Vec2& glPoint)
     clipCoord.z = clipCoord.z / clipCoord.w;
 
     Vec2 designSize = _renderView->getDesignResolutionSize();
-    float factor    = 1.0f / glCoord.w;
-    return Vec2(designSize.width * (clipCoord.x * 0.5f + 0.5f) * factor,
-                designSize.height * (-clipCoord.y * 0.5f + 0.5f) * factor);
+    float factor    = 1.0f / worldCoord.w;
+    float uiX       = designSize.width * (clipCoord.x * 0.5f + 0.5f) * factor;
+    float uiY       = designSize.height * (-clipCoord.y * 0.5f + 0.5f) * factor;
+
+    // Convert Axmol 2D(UI) coordinate to screen-coordinate
+    auto& viewScale = _renderView->getScale();
+    auto& vp        = _renderView->getViewportRect();
+    return Vec2{uiX * viewScale.x + vp.origin.x, uiY * viewScale.y + vp.origin.y};
 }
 
 const Vec2& Director::getCanvasSize() const
@@ -1076,7 +1095,7 @@ void Director::reset()
     _runningScene = nullptr;
     _nextScene    = nullptr;
 
-    _eventDispatcher->dispatchEvent(_eventResetDirector);
+    _eventDispatcher->dispatchEvent(_eventDirectorReset);
 
 #if defined(AX_ENABLE_AUDIO)
     // Fix github issue: https://github.com/axmolengine/axmol/issues/550
@@ -1164,7 +1183,6 @@ void Director::cleanupDirector()
     VertexLayoutManager::destroyInstance();
     rhi::DriverContext::destroyCurrentDriver();
 
-    // OpenGL view
     if (_renderView)
     {
         _renderView->end();
@@ -1204,7 +1222,7 @@ void Director::restartDirector()
 
 #if AX_ENABLE_CONTEXT_LOSS_RECOVERY
     // listen the event that renderer was recreated on Android/WP8
-    _rendererRecreatedListener = EventListenerCustom::create(EVENT_RENDERER_RECREATED, [this](EventCustom*) {
+    _rendererRecreatedListener = CustomEventListener::create(EVENT_RENDERER_RECREATED, [this](CustomEvent*) {
         _isStatusLabelUpdated = true;  // Force recreation of textures
     });
 
@@ -1561,12 +1579,10 @@ JobHandle Director::runAsync(std::function<void()> task, std::function<void()> d
     if (!task)
         return {};
 
-    RefPtr<Scheduler> scheduler(_scheduler);
-    return _jobSystem->enqueue(
-        [task = std::move(task), done = std::move(done), scheduler = std::move(scheduler)]() mutable {
+    return _jobSystem->enqueue([task = std::move(task), done = std::move(done), this]() mutable {
         task();
         if (done)
-            scheduler->runOnAxmolThread(std::move(done));
+            this->postTask(std::move(done));
     });
 }
 
@@ -1612,30 +1628,51 @@ void Director::startAnimation(SetIntervalReason reason)
     setNextDeltaTimeZero(true);
 }
 
-void Director::queueOperation(AsyncOperation op, void* param)
+void Director::postTask(std::function<void()> task, TaskTiming timing)
 {
-#if defined(AX_PLATFORM_GLFW)
-    _operations.enqueue([=]() { op(param); });
-#else
-    _renderView->queueOperation(op, param);
-#endif
+    if (!task) [[unlikely]]
+        return;
+
+    if (timing == TaskTiming::NextUpdate)
+        _nextUpdateTasks.enqueue(std::move(task));
+    else
+    {
+        _frameBoundaryTasks.enqueue(std::move(task));
+        ApplicationCore* axmolApp = Application::getInstance();
+        axmolApp->postBoundaryTaskSignal();
+    }
 }
 
-#if defined(AX_PLATFORM_GLFW)
-void Director::processOperations()
+void Director::clearPendingTasks(TaskTiming timing)
 {
-    std::function<void()> op;
-    while (_operations.try_dequeue(op))
-        op();
+    FrameTaskQueue dummyQueue;
+    if (timing == TaskTiming::NextUpdate)
+        _nextUpdateTasks.swap(dummyQueue);
+    else
+        _frameBoundaryTasks.swap(dummyQueue);
 }
-#endif
+
+void Director::performFrameBoundaryTasks()
+{
+    performFrameTasks(_frameBoundaryTasks);
+}
+
+void Director::performFrameTasks(FrameTaskQueue& frameTasks)
+{
+    size_t count = frameTasks.size_approx();
+    if (count > 0)
+    {
+        std::function<void()> op;
+        while (count-- > 0 && frameTasks.try_dequeue(op))
+        {
+            op();
+            op = nullptr;
+        }
+    }
+}
 
 void Director::renderFrame()
 {
-#if defined(AX_PLATFORM_GLFW)
-    processOperations();
-#endif
-
     if (_cleanupDirectorInNextLoop)
     {
         _cleanupDirectorInNextLoop = false;

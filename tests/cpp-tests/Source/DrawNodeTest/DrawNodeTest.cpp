@@ -2580,13 +2580,15 @@ DrawNodeAxmolTest2::DrawNodeAxmolTest2()
     scheduleUpdate();
 }
 
-void DrawNodeAxmolTest2::onChangedRadioButtonSelect(ui::RadioButton* radioButton, ui::RadioButton::EventType type)
+void DrawNodeAxmolTest2::onChangedRadioButtonSelect(ax::Object* sender, ui::RadioButton::EventType ev)
 {
-    if (radioButton == nullptr)
+    if (!sender)
     {
         return;
     }
-    switch (type)
+
+    auto radioButton = static_cast<ui::RadioButton*>(sender);
+    switch (ev)
     {
     case ui::RadioButton::EventType::SELECTED:
     {
@@ -2868,7 +2870,7 @@ DrawNodeSolidCircleTest::DrawNodeSolidCircleTest()
     showCircles();
 
     autoTestLabel = Label::createWithTTF(text, "fonts/arial.ttf", 16);
-    auto autoTestItem = MenuItemLabel::create(autoTestLabel, [=](Object* sender) {
+    auto autoTestItem = MenuItemLabel::create(autoTestLabel, [this](Object* /*sender*/) {
         primitive = (primitive + 1) % 4;
 
         switch (primitive)
@@ -3130,8 +3132,8 @@ void DrawNodeSpLinesTest::update(float dt)
 
 DrawNodeSpLinesOpenClosedTest::DrawNodeSpLinesOpenClosedTest()
 {
-    auto listener = EventListenerTouchAllAtOnce::create();
-    listener->onTouchesEnded = AX_CALLBACK_2(DrawNodeSpLinesOpenClosedTest::onTouchesEnded, this);
+    auto listener = PointerEventListener::create();
+    listener->onPointerUp = AX_CALLBACK_1(DrawNodeSpLinesOpenClosedTest::onPointerUp, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
     drawNodeCP = DrawNode::create();
@@ -3185,13 +3187,10 @@ void DrawNodeSpLinesOpenClosedTest::addNewControlPoint(Vec2 p)
     points.emplace_back(Vec2(p.x, p.y));
 }
 
-void DrawNodeSpLinesOpenClosedTest::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
+void DrawNodeSpLinesOpenClosedTest::onPointerUp(PointerEvent* event)
 {
-    for (auto& touch : touches)
-    {
-        auto location = touch->getLocation();
-        addNewControlPoint(location);
-    }
+    auto location = event->getLocation();
+    addNewControlPoint(location);
 }
 
 string DrawNodeSpLinesOpenClosedTest::title() const
