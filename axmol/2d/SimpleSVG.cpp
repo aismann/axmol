@@ -269,11 +269,11 @@ bool SimpleSVG::readCommand(char& c)
     skipChars();
     if (!*s)
         return false;
-    AXLOGDD("readCommand1'{}'", s);
+    AXLOGD("readCommand1'{}'", s);
     if (std::isalpha((unsigned char)*s))
     {
         c = *s++;
-        AXLOGDD("command: '{}'", c);
+        AXLOGD("command: '{}'", c);
         return true;
     }
     return false;
@@ -284,10 +284,10 @@ bool SimpleSVG::readFloat(float& v)
     skipChars();
     if (!*s)
         return false;
-    AXLOGDD("readFloat1'{}'", s);
+    AXLOGD("readFloat1'{}'", s);
     char* end = nullptr;
     v = std::strtof(s, &end);
-    AXLOGDD("value '{}'", v);
+    AXLOGD("value '{}'", v);
     if (end == s)
         return false;
     s = end;
@@ -335,7 +335,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
             if (!cmd)
                 break;
             c = cmd;  // implicit command repetition
-            AXLOGDD("command repetition: {}", c);
+            AXLOGD("command repetition: {}", c);
         }
         else
         {
@@ -351,7 +351,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
             if (!readFloat(x) || !readFloat(y))
                 break;
 
-            AXLOGDD("M {},{}", x, y);
+            AXLOGD("M {},{}", x, y);
             if (rel)
             {
                 x += curr.x;
@@ -390,7 +390,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
                     if (!readFloat(x) || !readFloat(y))
                         break;
 
-                    AXLOGDD("L {},{}", x, y);
+                    AXLOGD("L {},{}", x, y);
                     if (rel)
                     {
                         x += curr.x;
@@ -401,7 +401,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
                 {
                     if (!readFloat(x))
                         break;
-                    AXLOGDD("H {},{}", x, y);
+                    AXLOGD("H {},{}", x, y);
                     if (rel)
                         x += curr.x;
                     y = curr.y;
@@ -410,7 +410,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
                 {  // V
                     if (!readFloat(y))
                         break;
-                    AXLOGDD("V {},{}", x, y);
+                    AXLOGD("V {},{}", x, y);
                     if (rel)
                         y += curr.y;
                     x = curr.x;
@@ -427,7 +427,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
                 if (!readFloat(x1) || !readFloat(y1) || !readFloat(x2) || !readFloat(y2) ||
                     !readFloat(x) || !readFloat(y))
                     break;
-                AXLOGDD("C {},{} {},{} {},{}", x1, y1, x2, y2, x, y);
+                AXLOGD("C {},{} {},{} {},{}", x1, y1, x2, y2, x, y);
                 if (rel)
                 {
                     x1 += curr.x;
@@ -455,7 +455,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
                 float x1, y1, x, y;
                 if (!readFloat(x1) || !readFloat(y1) || !readFloat(x) || !readFloat(y))
                     break;
-                AXLOGDD("Q {},{} {},{}", x1, y1, x, y);
+                AXLOGD("Q {},{} {},{}", x1, y1, x, y);
                 if (rel)
                 {
                     x1 += curr.x;
@@ -483,7 +483,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
                     !readFloat(sf) || !readFloat(x) || !readFloat(y))
                     break;
 
-                AXLOGDD("A {},{} {} {} {} {},{}", rx, ry, xRot, laf, sf, x, y);
+                AXLOGD("A {},{} {} {} {} {},{}", rx, ry, xRot, laf, sf, x, y);
                 if (rel)
                 {
                     x += curr.x;
@@ -501,7 +501,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
         }
         else if (C == 'Z')
         {
-            AXLOGDD("Z");
+            AXLOGD("Z");
             subpaths.back().closed = true;
             subpaths.back().closed = true;
             subpaths.back().points.push_back(start);
@@ -510,7 +510,7 @@ std::vector<SimpleSVG::SvgSubpath> SimpleSVG::parseSvgPathToAxmolPolygons(const 
         }
         else
         {
-            AXLOGDD(">>>>>>>>>>>>>>>>>> Unsupported command: {}", C);
+            AXLOGD(">>>>>>>>>>>>>>>>>> Unsupported command: {}", C);
             // unsupported command – you can extend here
             break;
         }
