@@ -161,7 +161,7 @@ public:
      * Allocates and initializes a Label, base on platform-dependent API.
      *
      * @param text The initial text.
-     * @param font A font file or a font family name.
+     * @param font A font family name.
      * @param fontSize The font size. This value must be > 0.
      * @param dimensions
      * @param hAlignment The text horizontal alignment.
@@ -376,7 +376,7 @@ public:
     /**
      * Sets a new system font to Label.
      *
-     * @param font A font file or a font family name.
+     * @param font A font family name.
      * @warning
      */
     virtual void setSystemFontName(std::string_view font);
@@ -816,6 +816,7 @@ protected:
     void createShadowSpriteForSystemFont(const FontDefinition& fontDef);
 
     virtual void updateShaderProgram();
+    uint32_t getBuiltinProgramType();
     virtual void updateFontScale();
 
     void scaleFontSize(float fontSize);
@@ -848,6 +849,7 @@ protected:
     bool _contentDirty;
     bool _useDistanceField;
     bool _useA8Shader;
+    bool _usesBuiltinLabelProgram;
     bool _shadowDirty;
 
     bool _shadowEnabled;

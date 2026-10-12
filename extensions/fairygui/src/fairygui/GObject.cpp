@@ -279,22 +279,30 @@ void GObject::setScale(float xv, float yv)
 
 void GObject::setSkewX(float value)
 {
+//<<<<<<< HEAD
     if (_skewX != value)
     {
         _skewX = value;
         _displayObject->setRotationSkewX(_skewX + _rotation);  // Need skew and rotation for correct drawing
         updateGear(3);
     }
+//=======
+//    _displayObject->setSkewX(value);
+//>>>>>>> upstream/dev
 }
 
 void GObject::setSkewY(float value)
 {
+//<<<<<<< HEAD
     if (_skewY != value)
     {
         _skewY = value;
         _displayObject->setRotationSkewY(_skewY + _rotation); // Need skew and rotation for correct drawing
         updateGear(3);
     }
+//=======
+//    _displayObject->setSkewY(value);
+//>>>>>>> upstream/dev
 }
 
 void GObject::setRotation(float value)
